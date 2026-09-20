@@ -9,95 +9,173 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     // ===========================================================
+    // ELEMENTOS DEL FORMULARIO Y MODAL
+    // ===========================================================
+
+    const formReserva = document.getElementById('formReserva');
+    const modalNuevaReserva = document.getElementById('modalNuevaReserva');
+    const btnGuardar = document.getElementById('btnGuardarReserva');
+
+    // Verificar que los elementos existan
+    if (!formReserva) {
+        console.error('No se encontro el formulario formReserva');
+        return;
+    }
+
+    if (!modalNuevaReserva) {
+        console.error('No se encontro el modal modalNuevaReserva');
+        return;
+    }
+
+    if (!btnGuardar) {
+        console.error('No se encontro el boton btnGuardarReserva');
+        return;
+    }
+
+    // ===========================================================
+    // REINICIAR FORMULARIO AL ABRIR EL MODAL
+    // ===========================================================
+
+    modalNuevaReserva.addEventListener('show.bs.modal', function () {
+
+        formReserva.reset();
+
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = 'Guardar Reserva';
+
+        ocultarAlertaModal();
+
+        console.log('Modal de nueva reserva abierto');
+    });
+
+
+    // ===========================================================
     // 1. INICIALIZACION DEL CALENDARIO
     // ===========================================================
 
     const calendarEl = document.getElementById('calendar');
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        height: 'auto',
+    if (calendarEl && typeof FullCalendar !== 'undefined') {
 
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek'
-        },
+        const calendar = new FullCalendar.Calendar(calendarEl, {
 
-        buttonText: {
-            today: 'Hoy',
-            month: 'Mes',
-            week: 'Semana'
-        },
+            initialView: 'dayGridMonth',
 
-        events: function (fetchInfo, successCallback, failureCallback) {
+            locale: 'es',
 
-            fetch('../api/reservas.php', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
+            height: 'auto',
 
-                    if (!response.ok) {
-                        throw new Error('No se pudo cargar el calendario.');
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana'
+            },
+
+            events: function (fetchInfo, successCallback, failureCallback) {
+
+                fetch('../api/reservas.php', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
-
-                    return response.json();
                 })
-                .then(data => {
 
-                    successCallback(data);
+                    .then(response => {
 
-                })
-                .catch(error => {
+                        if (!response.ok) {
+                            throw new Error(
+                                'No se pudo cargar el calendario.'
+                            );
+                        }
 
-                    console.error('Error al cargar eventos:', error);
-                    failureCallback(error);
+                        return response.json();
+                    })
 
-                });
-        },
+                    .then(data => {
 
-        eventDidMount: function (info) {
+                        successCallback(data);
 
-            const motivo = info.event.extendedProps.motivo;
+                    })
 
-            if (motivo) {
-                info.el.setAttribute('title', motivo);
+                    .catch(error => {
+
+                        console.error(
+                            'Error al cargar eventos:',
+                            error
+                        );
+
+                        failureCallback(error);
+                    });
+            },
+
+            eventDidMount: function (info) {
+
+                const motivo =
+                    info.event.extendedProps.motivo;
+
+                if (motivo) {
+                    info.el.setAttribute('title', motivo);
+                }
             }
-        }
-    });
+        });
 
-    calendar.render();
+        calendar.render();
 
-    // Guardamos el calendario para poder actualizarlo
-    // despues de guardar una reserva.
-    window.calendarInstance = calendar;
+        // Guardamos el calendario
+        window.calendarInstance = calendar;
+
+    } else {
+
+        console.warn(
+            'FullCalendar no esta disponible o no existe #calendar'
+        );
+    }
 
 
     // ===========================================================
     // 2. FORMULARIO DE NUEVA RESERVA
     // ===========================================================
 
-    const formReserva = document.getElementById('formReserva');
-
     formReserva.addEventListener('submit', async function (e) {
 
         e.preventDefault();
 
-        const alertBox = document.getElementById('reservaAlert');
-        const btnGuardar = document.getElementById('btnGuardarReserva');
+        console.log('BOTON GUARDAR PRESIONADO');
 
-        // Obtener datos del formulario
+        const alertBox =
+            document.getElementById('reservaAlert');
+
+
+        // =======================================================
+        // OBTENER DATOS DEL FORMULARIO
+        // =======================================================
+
         const payload = {
-            id_laboratorio: document.getElementById('id_laboratorio').value,
-            fecha: document.getElementById('fecha').value,
-            hora_inicio: document.getElementById('hora_inicio').value,
-            hora_fin: document.getElementById('hora_fin').value,
-            motivo: document.getElementById('motivo').value.trim()
+
+            id_laboratorio:
+                document.getElementById('id_laboratorio').value,
+
+            fecha:
+                document.getElementById('fecha').value,
+
+            hora_inicio:
+                document.getElementById('hora_inicio').value,
+
+            hora_fin:
+                document.getElementById('hora_fin').value,
+
+            motivo:
+                document.getElementById('motivo').value.trim()
         };
+
+
+        console.log('Datos de reserva:', payload);
 
 
         // =======================================================
@@ -105,42 +183,52 @@ document.addEventListener('DOMContentLoaded', function () {
         // =======================================================
 
         if (!payload.id_laboratorio) {
+
             mostrarAlertaModal(
                 'Debe seleccionar un laboratorio.',
                 'danger'
             );
+
             return;
         }
 
         if (!payload.fecha) {
+
             mostrarAlertaModal(
                 'Debe seleccionar una fecha.',
                 'danger'
             );
+
             return;
         }
 
         if (!payload.hora_inicio || !payload.hora_fin) {
+
             mostrarAlertaModal(
                 'Debe indicar la hora de inicio y la hora de fin.',
                 'danger'
             );
+
             return;
         }
 
         if (payload.hora_fin <= payload.hora_inicio) {
+
             mostrarAlertaModal(
                 'La hora de fin debe ser posterior a la hora de inicio.',
                 'danger'
             );
+
             return;
         }
 
         if (!payload.motivo) {
+
             mostrarAlertaModal(
                 'Debe indicar el motivo de la reserva.',
                 'danger'
             );
+
             return;
         }
 
@@ -150,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // =======================================================
 
         btnGuardar.disabled = true;
+
         btnGuardar.textContent = 'Guardando...';
 
         ocultarAlertaModal();
@@ -161,22 +250,62 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
 
-            const response = await fetch('../api/reservas.php', {
-                method: 'POST',
+            console.log('Enviando reserva al servidor...');
 
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+            const response = await fetch(
+                '../api/reservas.php',
+                {
+                    method: 'POST',
 
-                body: JSON.stringify(payload)
-            });
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify(payload)
+                }
+            );
 
 
-            // Intentamos obtener la respuesta JSON
-            const data = await response.json();
+            console.log(
+                'Codigo HTTP:',
+                response.status
+            );
 
 
-            console.log('Respuesta del servidor:', data);
+            const textoRespuesta =
+                await response.text();
+
+
+            console.log(
+                'Respuesta PHP:',
+                textoRespuesta
+            );
+
+
+            // ===================================================
+            // CONVERTIR RESPUESTA A JSON
+            // ===================================================
+
+            let data;
+
+            try {
+
+                data =
+                    JSON.parse(textoRespuesta);
+
+            } catch (error) {
+
+                throw new Error(
+                    'El servidor no devolvio JSON. Respuesta: ' +
+                    textoRespuesta
+                );
+            }
+
+
+            console.log(
+                'Respuesta del servidor:',
+                data
+            );
 
 
             // ===================================================
@@ -186,35 +315,50 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.success) {
 
                 mostrarAlertaModal(
-                    data.message || 'Reserva registrada correctamente.',
+                    data.message ||
+                    'Reserva registrada correctamente.',
                     'success'
                 );
 
 
                 // Actualizar calendario
                 if (window.calendarInstance) {
+
                     window.calendarInstance.refetchEvents();
+
                 }
 
 
-                // Cerrar modal despues de un momento
+                // Cerrar modal despues de 1.2 segundos
                 setTimeout(function () {
 
                     const modalEl =
-                        document.getElementById('modalNuevaReserva');
+                        document.getElementById(
+                            'modalNuevaReserva'
+                        );
 
                     const modalInstance =
-                        bootstrap.Modal.getInstance(modalEl);
+                        bootstrap.Modal.getInstance(
+                            modalEl
+                        );
 
                     if (modalInstance) {
+
                         modalInstance.hide();
+
                     }
 
                     formReserva.reset();
 
+                    btnGuardar.disabled = false;
+
+                    btnGuardar.textContent =
+                        'Guardar Reserva';
+
                     ocultarAlertaModal();
 
                 }, 1200);
+
 
             } else {
 
@@ -223,9 +367,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 // =================================================
 
                 mostrarAlertaModal(
-                    data.message || 'No se pudo registrar la reserva.',
+                    data.message ||
+                    'No se pudo registrar la reserva.',
                     'danger'
                 );
+
             }
 
 
@@ -241,14 +387,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 'danger'
             );
 
+
         } finally {
 
             // Volver a habilitar boton
             btnGuardar.disabled = false;
-            btnGuardar.textContent = 'Guardar Reserva';
+
+            btnGuardar.textContent =
+                'Guardar Reserva';
         }
 
     });
+
+
+    // ===========================================================
+    // 3. REINICIAR AL CERRAR EL MODAL
+    // ===========================================================
+
+    modalNuevaReserva.addEventListener(
+        'hidden.bs.modal',
+        function () {
+
+            formReserva.reset();
+
+            btnGuardar.disabled = false;
+
+            btnGuardar.textContent =
+                'Guardar Reserva';
+
+            ocultarAlertaModal();
+
+            console.log(
+                'Formulario de reserva reiniciado'
+            );
+        }
+    );
 
 
     // ===========================================================
@@ -260,6 +433,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const alertBox =
             document.getElementById('reservaAlert');
 
+        if (!alertBox) {
+            return;
+        }
+
         alertBox.textContent = mensaje;
 
         alertBox.className =
@@ -267,6 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         alertBox.classList.remove('d-none');
     }
+
 
     // ===========================================================
     // OCULTAR MENSAJE
@@ -276,6 +454,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const alertBox =
             document.getElementById('reservaAlert');
+
+        if (!alertBox) {
+            return;
+        }
 
         alertBox.classList.add('d-none');
     }
