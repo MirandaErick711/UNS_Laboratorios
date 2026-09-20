@@ -8,6 +8,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     cargarPendientes();
+    cargarIndicadores();
 });
 
 /**
@@ -168,4 +169,216 @@ function escaparHtml(texto) {
     const div = document.createElement('div');
     div.textContent = texto ?? '';
     return div.innerHTML;
+}
+
+/**
+ * =========================================================
+ * CARGAR INDICADORES
+ * =========================================================
+ */
+
+async function cargarIndicadores() {
+
+    const cargando =
+        document.getElementById('cargandoIndicadores');
+
+    const tabla =
+        document.getElementById('tablaUsoLaboratorios');
+
+    try {
+
+        const response = await fetch(
+            '../api/estadisticas.php',
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message ||
+                'No se pudieron cargar los indicadores.'
+            );
+        }
+
+
+        const indicadores =
+            data.data;
+
+
+        // =====================================================
+        // INDICADORES GENERALES
+        // =====================================================
+
+        document.getElementById(
+            'indicadorOperativos'
+        ).textContent =
+            indicadores.laboratorios.laboratorios_operativos;
+
+
+        document.getElementById(
+            'indicadorMantenimiento'
+        ).textContent =
+            indicadores.laboratorios.laboratorios_mantenimiento;
+
+
+        document.getElementById(
+            'indicadorPendientes'
+        ).textContent =
+            indicadores.reservas_pendientes;
+
+
+        document.getElementById(
+            'indicadorAprobadas'
+        ).textContent =
+            indicadores.reservas_aprobadas_mes;
+
+
+        // =====================================================
+        // TABLA DE USO
+        // =====================================================
+
+        renderizarUsoLaboratorios(
+            indicadores.uso_por_laboratorio
+        );
+
+
+        if (cargando) {
+            cargando.classList.add('d-none');
+        }
+
+        if (tabla) {
+            tabla.classList.remove('d-none');
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al cargar indicadores:',
+            error
+        );
+
+        if (cargando) {
+            cargando.classList.add('d-none');
+        }
+
+        const cuerpo =
+            document.getElementById(
+                'cuerpoUsoLaboratorios'
+            );
+
+        if (cuerpo) {
+
+            cuerpo.innerHTML = `
+                <tr>
+                    <td
+                        colspan="3"
+                        class="text-center text-danger py-4"
+                    >
+                        No se pudieron cargar los indicadores.
+                    </td>
+                </tr>
+            `;
+
+            tabla.classList.remove('d-none');
+        }
+    }
+}
+
+
+/**
+ * =========================================================
+ * MOSTRAR USO POR LABORATORIO
+ * =========================================================
+ */
+
+function renderizarUsoLaboratorios(laboratorios) {
+
+    const cuerpo =
+        document.getElementById(
+            'cuerpoUsoLaboratorios'
+        );
+
+
+    if (!cuerpo) {
+        return;
+    }
+
+
+    cuerpo.innerHTML = '';
+
+
+    if (!laboratorios || laboratorios.length === 0) {
+
+        cuerpo.innerHTML = `
+            <tr>
+                <td
+                    colspan="3"
+                    class="text-center text-muted py-4"
+                >
+                    No hay laboratorios registrados.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    laboratorios.forEach(function (laboratorio) {
+
+        let badgeEstado = '';
+
+        if (laboratorio.estado === 'Operativo') {
+
+            badgeEstado =
+                '<span class="badge bg-success">Operativo</span>';
+
+        } else if (
+            laboratorio.estado === 'Mantenimiento'
+        ) {
+
+            badgeEstado =
+                '<span class="badge bg-warning text-dark">Mantenimiento</span>';
+
+        } else {
+
+            badgeEstado =
+                '<span class="badge bg-secondary">' +
+                escaparHtml(laboratorio.estado) +
+                '</span>';
+        }
+
+
+        cuerpo.innerHTML += `
+            <tr>
+
+                <td class="fw-semibold">
+                    ${escaparHtml(laboratorio.nombre)}
+                </td>
+
+                <td>
+                    ${badgeEstado}
+                </td>
+
+                <td class="text-center">
+
+                    <span class="badge bg-primary rounded-pill">
+                        ${laboratorio.reservas_mes}
+                    </span>
+
+                </td>
+
+            </tr>
+        `;
+    });
 }

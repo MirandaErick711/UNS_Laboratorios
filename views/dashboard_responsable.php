@@ -67,12 +67,221 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
 <!-- ============================ -->
 <div class="container-fluid px-4 py-4">
 
-    <div class="mb-4">
-        <h4 class="fw-bold mb-0" style="color: var(--uns-rojo);">
-            <i class="bi bi-hourglass-split me-2"></i>Solicitudes Pendientes de Aprobación
-        </h4>
-        <small class="text-muted">Revisa y gestiona las reservas solicitadas por los docentes</small>
+<div class="mb-4">
+    <h4 class="fw-bold mb-0" style="color: var(--uns-rojo);">
+        <i class="bi bi-speedometer2 me-2"></i>
+        Panel del Responsable
+    </h4>
+
+    <small class="text-muted">
+        Consulta el estado de los laboratorios y gestiona las reservas.
+    </small>
+</div>
+
+
+<!-- ===================================================== -->
+<!-- INDICADORES -->
+<!-- ===================================================== -->
+
+<div class="row g-3 mb-4" id="contenedorIndicadores">
+
+    <!-- Laboratorios operativos -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <small class="text-muted">
+                            Laboratorios operativos
+                        </small>
+
+                        <h3
+                            class="fw-bold mb-0"
+                            id="indicadorOperativos"
+                        >
+                            -
+                        </h3>
+                    </div>
+
+                    <div class="fs-2 text-success">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
     </div>
+
+
+    <!-- Mantenimiento -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <small class="text-muted">
+                            En mantenimiento
+                        </small>
+
+                        <h3
+                            class="fw-bold mb-0"
+                            id="indicadorMantenimiento"
+                        >
+                            -
+                        </h3>
+                    </div>
+
+                    <div class="fs-2 text-warning">
+                        <i class="bi bi-tools"></i>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Pendientes -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <small class="text-muted">
+                            Reservas pendientes
+                        </small>
+
+                        <h3
+                            class="fw-bold mb-0"
+                            id="indicadorPendientes"
+                        >
+                            -
+                        </h3>
+                    </div>
+
+                    <div class="fs-2 text-primary">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Aprobadas -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <small class="text-muted">
+                            Aprobadas este mes
+                        </small>
+
+                        <h3
+                            class="fw-bold mb-0"
+                            id="indicadorAprobadas"
+                        >
+                            -
+                        </h3>
+                    </div>
+
+                    <div class="fs-2 text-success">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- USO DE LABORATORIOS -->
+<!-- ===================================================== -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-white">
+
+        <h5
+            class="fw-bold mb-0"
+            style="color: var(--uns-rojo);"
+        >
+            <i class="bi bi-bar-chart me-2"></i>
+            Uso de laboratorios este mes
+        </h5>
+
+        <small class="text-muted">
+            Cantidad de reservas aprobadas por laboratorio.
+        </small>
+
+    </div>
+
+    <div class="card-body">
+
+        <div id="cargandoIndicadores" class="text-center py-3">
+
+            <div
+                class="spinner-border"
+                style="color: var(--uns-rojo);"
+            ></div>
+
+            <p class="text-muted mt-2 mb-0">
+                Cargando indicadores...
+            </p>
+
+        </div>
+
+
+        <div
+            id="tablaUsoLaboratorios"
+            class="table-responsive d-none"
+        >
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr class="table-light">
+
+                        <th>Laboratorio</th>
+
+                        <th>Estado</th>
+
+                        <th class="text-center">
+                            Reservas aprobadas
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="cuerpoUsoLaboratorios">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
 
     <!-- Alerta general de la página (errores de carga, etc.) -->
     <div id="alertaGeneral" class="alert py-2 d-none"></div>
