@@ -139,11 +139,34 @@ class Reserva
      */
     public function buscarPorId(int $idReserva): array|false
     {
-        $sql = "SELECT id_reserva, estado FROM reservas WHERE id_reserva = :id_reserva LIMIT 1";
+        $sql = "
+            SELECT
+                r.id_reserva,
+                r.id_usuario,
+                r.id_laboratorio,
+                r.fecha,
+                r.hora_inicio,
+                r.hora_fin,
+                r.estado,
+                l.nombre AS nombre_laboratorio
+            FROM reservas r
+            INNER JOIN laboratorios l
+                ON l.id_laboratorio = r.id_laboratorio
+            WHERE r.id_reserva = :id_reserva
+            LIMIT 1
+        ";
+
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id_reserva', $idReserva, PDO::PARAM_INT);
+
+        $stmt->bindParam(
+            ':id_reserva',
+            $idReserva,
+            PDO::PARAM_INT
+        );
+
         $stmt->execute();
-        return $stmt->fetch();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**

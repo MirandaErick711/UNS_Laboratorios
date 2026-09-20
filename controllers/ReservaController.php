@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/Reserva.php';
+require_once __DIR__ . '/../models/Aviso.php';
 
 /**
  * Controlador de Reservas
@@ -9,10 +10,12 @@ require_once __DIR__ . '/../models/Reserva.php';
 class ReservaController
 {
     private Reserva $reservaModel;
+    private Aviso $avisoModel;
 
     public function __construct()
     {
         $this->reservaModel = new Reserva();
+        $this->avisoModel = new Aviso();
     }
 
     /**
@@ -183,9 +186,34 @@ class ReservaController
                 return ["success" => false, "http_code" => 409, "message" => "Esta reserva ya fue procesada anteriormente."];
             }
 
-            $this->reservaModel->actualizarEstado($idReserva, $nuevoEstado);
+        $this->reservaModel->actualizarEstado($idReserva, $nuevoEstado);
 
-            $pdo->commit();
+        // Crear aviso para el docente
+        if ($nuevoEstado === 'Aprobada') {
+
+            $titulo = 'Reserva aprobada';
+
+            $mensaje = "Tu reserva del laboratorio {$reserva['nombre_laboratorio']} " .
+                    "para el {$reserva['fecha']} de {$reserva['hora_inicio']} " .
+                    "a {$reserva['hora_fin']} fue aprobada.";
+
+        } else {
+
+            $titulo = 'Reserva rechazada';
+
+            $mensaje = "Tu reserva del laboratorio {$reserva['nombre_laboratorio']} " .
+                    "para el {$reserva['fecha']} de {$reserva['hora_inicio']} " .
+                    "a {$reserva['hora_fin']} fue rechazada.";
+        }
+
+        $this->avisoModel->crear(
+            (int) $reserva['id_usuario'],
+            $idReserva,
+            $titulo,
+            $mensaje
+        );
+
+        $pdo->commit();
 
             return [
                 "success"   => true,
