@@ -47,7 +47,19 @@ class ReservaController
             // -----------------------------------------------------------
             $pdo->beginTransaction();
 
-            // 1. Verificar cruce de horarios (con bloqueo FOR UPDATE)
+            // 1. Verificar que el laboratorio este operativo
+            if (!$this->reservaModel->laboratorioEstaOperativo($idLaboratorio)) {
+
+                $pdo->rollBack();
+
+                return [
+                    "success" => false,
+                    "http_code" => 409,
+                    "message" => "El laboratorio seleccionado se encuentra en mantenimiento."
+                ];
+            }
+
+            // 2. Verificar cruce de horarios (con bloqueo FOR UPDATE)
             if ($this->reservaModel->existeCruce($idLaboratorio, $fecha, $horaInicio, $horaFin)) {
                 $pdo->rollBack();
                 return [
@@ -57,10 +69,10 @@ class ReservaController
                 ];
             }
 
-            // 2. Insertar la reserva (estado 'Pendiente' por defecto)
+            // 3. Insertar la reserva (estado 'Pendiente' por defecto)
             $idReserva = $this->reservaModel->crear($idUsuario, $idLaboratorio, $fecha, $horaInicio, $horaFin, $motivo);
 
-            // 3. Confirmar cambios
+            // 4. Confirmar cambios
             $pdo->commit();
             // -----------------------------------------------------------
             // FIN DE TRANSACCIÓN
@@ -83,7 +95,7 @@ class ReservaController
             return [
                 "success"   => false,
                 "http_code" => 500,
-                "message"   => "Error al procesar la reserva. Intenta nuevamente."
+                "message"   => "ERROR SQL: " . $e->getMessage() 
             ];
         }
     }

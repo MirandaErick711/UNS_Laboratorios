@@ -15,6 +15,28 @@ class Reserva
         $this->conn = Database::getInstance()->getConnection();
     }
 
+    // Verifica si el laboratorio esta operativo
+    public function laboratorioEstaOperativo(int $idLaboratorio): bool
+    {
+        $sql = "SELECT id_laboratorio
+                FROM laboratorios
+                WHERE id_laboratorio = :id_laboratorio
+                  AND estado = 'Operativo'
+                LIMIT 1";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bindParam(
+            ':id_laboratorio',
+            $idLaboratorio,
+            PDO::PARAM_INT
+        );
+
+        $stmt->execute();
+
+        return $stmt->fetch() !== false;
+    }
+
     /**
      * Verifica si existe una reserva (Pendiente o Aprobada) que se solape
      * en tiempo con el rango solicitado, para el mismo laboratorio y fecha.
