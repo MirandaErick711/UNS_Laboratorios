@@ -8,10 +8,12 @@ class Laboratorio
 
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
+        $this->db = Database::getInstance()->getConnection();
     }
 
+    /**
+     * Obtener todos los laboratorios
+     */
     public function obtenerTodos(): array
     {
         $sql = "SELECT 
@@ -29,6 +31,9 @@ class Laboratorio
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Obtener solamente laboratorios operativos
+     */
     public function obtenerOperativos(): array
     {
         $sql = "SELECT 

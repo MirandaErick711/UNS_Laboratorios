@@ -1,27 +1,27 @@
 <?php
 
-session_start();
+header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../models/Laboratorio.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
 try {
+
     $laboratorio = new Laboratorio();
 
-    $laboratorios = $laboratorio->obtenerOperativos();
+    $datos = $laboratorio->obtenerOperativos();
 
     echo json_encode([
         'success' => true,
-        'data' => $laboratorios
-    ]);
+        'data' => $datos
+    ], JSON_UNESCAPED_UNICODE);
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
 
     http_response_code(500);
 
     echo json_encode([
         'success' => false,
-        'message' => 'Error al obtener los laboratorios'
-    ]);
+        'message' => 'Error al cargar los laboratorios',
+        'error' => $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
 }

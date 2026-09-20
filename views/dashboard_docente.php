@@ -245,7 +245,7 @@ $idUsuario = (int) $_SESSION['id_usuario'];
                             id="motivo"
                             name="motivo"
                             rows="3"
-                            placeholder="Ejemplo: Clase de Base de Datos"
+                            placeholder="Ejemplo: Practica de Electronica"
                             required
                         ></textarea>
                     </div>

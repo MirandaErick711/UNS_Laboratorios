@@ -1,61 +1,69 @@
 /**
  * app.js
- * Lógica del Dashboard del Docente:
- *  - Inicialización de FullCalendar (con eventos reales desde la BD)
- *  - Envío asíncrono del formulario de reservas (SPA con fetch)
+ * Logica del Dashboard del Docente:
+ *  - Inicializacion de FullCalendar
+ *  - Carga de reservas desde la BD
+ *  - Registro de nuevas reservas
  */
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // -----------------------------------------------------------
-    // 1. INICIALIZACIÓN DE FULLCALENDAR (con fuente de datos real)
-    // -----------------------------------------------------------
+    // ===========================================================
+    // 1. INICIALIZACION DEL CALENDARIO
+    // ===========================================================
+
     const calendarEl = document.getElementById('calendar');
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'es',
         height: 'auto',
+
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek'
         },
+
         buttonText: {
             today: 'Hoy',
             month: 'Mes',
             week: 'Semana'
         },
 
-        // -----------------------------------------------------------
-        // Fuente de eventos dinámica: FullCalendar llama automáticamente
-        // a esta función cada vez que necesita (re)pintar el calendario,
-        // incluyendo cuando se llama a calendar.refetchEvents().
-        // -----------------------------------------------------------
         events: function (fetchInfo, successCallback, failureCallback) {
+
             fetch('../api/reservas.php', {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
                 .then(response => {
+
                     if (!response.ok) {
                         throw new Error('No se pudo cargar el calendario.');
                     }
+
                     return response.json();
                 })
                 .then(data => {
-                    // 'data' ya viene en el formato { id, title, start, end, color } listo para FullCalendar
+
                     successCallback(data);
+
                 })
                 .catch(error => {
+
                     console.error('Error al cargar eventos:', error);
                     failureCallback(error);
+
                 });
         },
 
-        // Tooltip simple con el motivo al pasar el mouse sobre un evento
         eventDidMount: function (info) {
+
             const motivo = info.event.extendedProps.motivo;
+
             if (motivo) {
                 info.el.setAttribute('title', motivo);
             }
@@ -64,23 +72,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     calendar.render();
 
-    // Guardamos la instancia en el scope global para poder refrescarla
-    // desde el bloque de guardado de reservas (ver más abajo).
+    // Guardamos el calendario para poder actualizarlo
+    // despues de guardar una reserva.
     window.calendarInstance = calendar;
 
-    // -----------------------------------------------------------
-    // 2. ENVÍO DEL FORMULARIO DE NUEVA RESERVA (fetch -> JSON)
-    // -----------------------------------------------------------
+
+    // ===========================================================
+    // 2. FORMULARIO DE NUEVA RESERVA
+    // ===========================================================
+
     const formReserva = document.getElementById('formReserva');
 
     formReserva.addEventListener('submit', async function (e) {
+
         e.preventDefault();
 
         const alertBox = document.getElementById('reservaAlert');
         const btnGuardar = document.getElementById('btnGuardarReserva');
-        const btnText = document.getElementById('btnGuardarText');
-        const btnSpinner = document.getElementById('btnGuardarSpinner');
 
+        // Obtener datos del formulario
         const payload = {
             id_laboratorio: document.getElementById('id_laboratorio').value,
             fecha: document.getElementById('fecha').value,
@@ -89,70 +99,184 @@ document.addEventListener('DOMContentLoaded', function () {
             motivo: document.getElementById('motivo').value.trim()
         };
 
-        if (payload.hora_fin <= payload.hora_inicio) {
-            mostrarAlertaModal('La hora de fin debe ser posterior a la hora de inicio.', 'danger');
+
+        // =======================================================
+        // VALIDACIONES
+        // =======================================================
+
+        if (!payload.id_laboratorio) {
+            mostrarAlertaModal(
+                'Debe seleccionar un laboratorio.',
+                'danger'
+            );
             return;
         }
 
+        if (!payload.fecha) {
+            mostrarAlertaModal(
+                'Debe seleccionar una fecha.',
+                'danger'
+            );
+            return;
+        }
+
+        if (!payload.hora_inicio || !payload.hora_fin) {
+            mostrarAlertaModal(
+                'Debe indicar la hora de inicio y la hora de fin.',
+                'danger'
+            );
+            return;
+        }
+
+        if (payload.hora_fin <= payload.hora_inicio) {
+            mostrarAlertaModal(
+                'La hora de fin debe ser posterior a la hora de inicio.',
+                'danger'
+            );
+            return;
+        }
+
+        if (!payload.motivo) {
+            mostrarAlertaModal(
+                'Debe indicar el motivo de la reserva.',
+                'danger'
+            );
+            return;
+        }
+
+
+        // =======================================================
+        // DESHABILITAR BOTON
+        // =======================================================
+
         btnGuardar.disabled = true;
-        btnText.textContent = 'Guardando...';
-        btnSpinner.classList.remove('d-none');
+        btnGuardar.textContent = 'Guardando...';
+
         ocultarAlertaModal();
 
+
+        // =======================================================
+        // ENVIAR RESERVA AL SERVIDOR
+        // =======================================================
+
         try {
+
             const response = await fetch('../api/reservas.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
                 body: JSON.stringify(payload)
             });
 
-            // Importante: leemos el JSON incluso si el status es 409 o 400,
-            // porque el backend siempre devuelve un mensaje útil en el body.
+
+            // Intentamos obtener la respuesta JSON
             const data = await response.json();
 
+
+            console.log('Respuesta del servidor:', data);
+
+
+            // ===================================================
+            // RESERVA GUARDADA
+            // ===================================================
+
             if (data.success) {
-                mostrarAlertaModal(data.message, 'success');
 
-                // -----------------------------------------------------
-                // Refrescamos el calendario al instante, sin recargar
-                // la página, para que la nueva reserva aparezca ya.
-                // -----------------------------------------------------
-                window.calendarInstance.refetchEvents();
+                mostrarAlertaModal(
+                    data.message || 'Reserva registrada correctamente.',
+                    'success'
+                );
 
-                setTimeout(() => {
-                    const modalEl = document.getElementById('modalNuevaReserva');
-                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                    modalInstance.hide();
+
+                // Actualizar calendario
+                if (window.calendarInstance) {
+                    window.calendarInstance.refetchEvents();
+                }
+
+
+                // Cerrar modal despues de un momento
+                setTimeout(function () {
+
+                    const modalEl =
+                        document.getElementById('modalNuevaReserva');
+
+                    const modalInstance =
+                        bootstrap.Modal.getInstance(modalEl);
+
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
 
                     formReserva.reset();
+
                     ocultarAlertaModal();
+
                 }, 1200);
 
             } else {
-                // Aquí llegan tanto errores de validación (400) como
-                // el caso clave: HTTP 409 por cruce de horario.
-                mostrarAlertaModal(data.message || 'No se pudo registrar la reserva.', 'danger');
+
+                // =================================================
+                // ERROR DEVUELTO POR EL SERVIDOR
+                // =================================================
+
+                mostrarAlertaModal(
+                    data.message || 'No se pudo registrar la reserva.',
+                    'danger'
+                );
             }
 
+
         } catch (error) {
-            console.error('Error en la solicitud:', error);
-            mostrarAlertaModal('Error de conexión con el servidor.', 'danger');
+
+            console.error(
+                'Error al registrar la reserva:',
+                error
+            );
+
+            mostrarAlertaModal(
+                'Error de conexion con el servidor.',
+                'danger'
+            );
+
         } finally {
+
+            // Volver a habilitar boton
             btnGuardar.disabled = false;
-            btnText.textContent = 'Confirmar Reserva';
-            btnSpinner.classList.add('d-none');
+            btnGuardar.textContent = 'Guardar Reserva';
         }
+
     });
 
+
+    // ===========================================================
+    // MOSTRAR MENSAJE
+    // ===========================================================
+
     function mostrarAlertaModal(mensaje, tipo) {
-        const alertBox = document.getElementById('reservaAlert');
+
+        const alertBox =
+            document.getElementById('reservaAlert');
+
         alertBox.textContent = mensaje;
-        alertBox.className = `alert alert-${tipo} py-2`;
+
+        alertBox.className =
+            `alert alert-${tipo} py-2`;
+
         alertBox.classList.remove('d-none');
     }
 
+    // ===========================================================
+    // OCULTAR MENSAJE
+    // ===========================================================
+
     function ocultarAlertaModal() {
-        const alertBox = document.getElementById('reservaAlert');
+
+        const alertBox =
+            document.getElementById('reservaAlert');
+
         alertBox.classList.add('d-none');
     }
 
