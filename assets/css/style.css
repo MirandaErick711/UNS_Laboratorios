@@ -1,0 +1,71 @@
+:root {
+    --uns-rojo: #a30000;
+    --uns-rojo-oscuro: #7a0000;
+    --uns-blanco: #ffffff;
+    --uns-gris-texto: #333333;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    background: linear-gradient(135deg, #fdfdfd 0%, #f2f2f2 100%);
+    color: var(--uns-gris-texto);
+    min-height: 100vh;
+}
+
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background: var(--uns-blanco);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    max-width: 900px;
+    width: 100%;
+}
+
+.login-brand {
+    background: linear-gradient(160deg, var(--uns-rojo) 0%, var(--uns-rojo-oscuro) 100%);
+    color: var(--uns-blanco);
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.login-brand img {
+    width: 90px;
+    margin-bottom: 1rem;
+}
+
+.login-form-container {
+    padding: 3rem 2.5rem;
+}
+
+.btn-uns {
+    background-color: var(--uns-rojo);
+    border-color: var(--uns-rojo);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.btn-uns:hover {
+    background-color: var(--uns-rojo-oscuro);
+    border-color: var(--uns-rojo-oscuro);
+}
+
+.form-control:focus {
+    border-color: var(--uns-rojo);
+    box-shadow: 0 0 0 0.2rem rgba(163, 0, 0, 0.15);
+}
+
+#loginAlert {
+    display: none;
+}
