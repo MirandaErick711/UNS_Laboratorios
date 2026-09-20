@@ -90,6 +90,21 @@ class Estadistica
         return (int) $stmt->fetchColumn();
     }
 
+    public function obtenerReservasRechazadasMes(): int
+    {
+        $sql = "
+            SELECT COUNT(*) AS total
+            FROM reservas
+            WHERE estado = 'Rechazada'
+            AND YEAR(fecha) = YEAR(CURDATE())
+            AND MONTH(fecha) = MONTH(CURDATE())
+        ";
+
+        $stmt = $this->conn->query($sql);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     /**
      * Obtiene el número de reservas por laboratorio
      * durante el mes actual.
@@ -143,15 +158,10 @@ class Estadistica
     {
         return [
             'laboratorios' => $this->obtenerIndicadores(),
-
-            'reservas_pendientes' =>
-                $this->obtenerReservasPendientes(),
-
-            'reservas_aprobadas_mes' =>
-                $this->obtenerReservasAprobadasMes(),
-
-            'uso_por_laboratorio' =>
-                $this->obtenerUsoPorLaboratorio()
+            'reservas_pendientes' => $this->obtenerReservasPendientes(),
+            'reservas_aprobadas_mes' => $this->obtenerReservasAprobadasMes(),
+            'reservas_rechazadas_mes' => $this->obtenerReservasRechazadasMes(),
+            'uso_por_laboratorio' => $this->obtenerUsoPorLaboratorio()
         ];
     }
 }

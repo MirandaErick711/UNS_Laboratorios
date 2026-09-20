@@ -112,6 +112,10 @@ async function procesarReserva(idReserva, nuevoEstado) {
         const data = await response.json();
 
         if (data.success) {
+
+            // Actualizar indicadores inmediatamente
+            cargarIndicadores();
+
             // Animación breve de salida antes de remover la fila del DOM
             fila.style.transform = 'translateX(30px)';
             fila.style.opacity = '0';
@@ -240,7 +244,9 @@ async function cargarIndicadores() {
             'indicadorAprobadas'
         ).textContent =
             indicadores.reservas_aprobadas_mes;
-
+            
+        document.getElementById('indicadorRechazadas').textContent =
+        indicadores.reservas_rechazadas_mes;
 
         // =====================================================
         // TABLA DE USO
@@ -307,15 +313,11 @@ function renderizarUsoLaboratorios(laboratorios) {
         document.getElementById(
             'cuerpoUsoLaboratorios'
         );
-
-
     if (!cuerpo) {
         return;
     }
 
-
     cuerpo.innerHTML = '';
-
 
     if (!laboratorios || laboratorios.length === 0) {
 

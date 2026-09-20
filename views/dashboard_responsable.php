@@ -86,7 +86,7 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
 <div class="row g-3 mb-4" id="contenedorIndicadores">
 
     <!-- Laboratorios operativos -->
-    <div class="col-md-6 col-xl-3">
+    <div class="col-xl col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
 
@@ -117,7 +117,7 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
 
 
     <!-- Mantenimiento -->
-    <div class="col-md-6 col-xl-3">
+    <div class="col-xl col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
 
@@ -148,7 +148,7 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
 
 
     <!-- Pendientes -->
-    <div class="col-md-6 col-xl-3">
+    <div class="col-xl col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
 
@@ -179,7 +179,7 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
 
 
     <!-- Aprobadas -->
-    <div class="col-md-6 col-xl-3">
+    <div class="col-xl col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
 
@@ -208,6 +208,22 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
         </div>
     </div>
 
+    <div class="col-xl col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Rechazadas este mes</small>
+                        <h3 class="fw-bold mb-0" id="indicadorRechazadas">-</h3>
+                    </div>
+
+                    <div class="fs-2 text-danger">
+                        <i class="bi bi-x-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
