@@ -1,6 +1,8 @@
 <?php
+
 require_once __DIR__ . '/../models/Reserva.php';
 require_once __DIR__ . '/../models/Aviso.php';
+require_once __DIR__ . '/../models/Auditoria.php';
 
 /**
  * Controlador de Reservas
@@ -11,11 +13,13 @@ class ReservaController
 {
     private Reserva $reservaModel;
     private Aviso $avisoModel;
+    private Auditoria $auditoriaModel;
 
     public function __construct()
     {
         $this->reservaModel = new Reserva();
         $this->avisoModel = new Aviso();
+        $this->auditoriaModel = new Auditoria();
     }
 
     /**
@@ -211,6 +215,13 @@ class ReservaController
             $idReserva,
             $titulo,
             $mensaje
+        );
+
+        $this->auditoriaModel->registrar(
+            (int) $_SESSION['id_usuario'],
+            strtoupper($nuevoEstado === 'Aprobada' ? 'APROBAR' : 'RECHAZAR'),
+            'Reservas',
+            "Reserva #{$idReserva} del laboratorio {$reserva['nombre_laboratorio']} {$nuevoEstado}."
         );
 
         $pdo->commit();

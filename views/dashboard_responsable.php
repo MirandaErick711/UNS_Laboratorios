@@ -48,15 +48,30 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
         <a class="navbar-brand fw-bold" href="#">
             <i class="bi bi-building me-2"></i>UNS · Reserva de Laboratorios
         </a>
-
         <div class="d-flex align-items-center text-white">
             <span class="me-3 d-none d-md-inline">
                 <i class="bi bi-person-circle me-1"></i>
                 <?php echo $nombreCompleto; ?>
-                <span class="badge bg-light text-dark ms-1">Responsable</span>
+                <span class="badge bg-light text-dark ms-1">
+                    Responsable
+                </span>
             </span>
-            <a href="../logout.php" class="btn btn-outline-light btn-sm">
-                <i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión
+            <button
+                type="button"
+                class="btn btn-outline-light btn-sm me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#modalAuditoria"
+                onclick="cargarAuditoria()"
+            >
+                <i class="bi bi-clock-history me-1"></i>
+                Auditoría
+            </button>
+            <a
+                href="../logout.php"
+                class="btn btn-outline-light btn-sm"
+            >
+                <i class="bi bi-box-arrow-right me-1"></i>
+                Cerrar Sesión
             </a>
         </div>
     </div>
@@ -337,7 +352,110 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
 
         </div>
     </div>
+    <!-- ===================================================== -->
+    <!-- MODAL DE AUDITORIA -->
+    <!-- ===================================================== -->
 
+    <div
+        class="modal fade"
+        id="modalAuditoria"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div
+                    class="modal-header text-white"
+                    style="background-color: var(--uns-rojo);"
+                >
+
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Auditoría del sistema
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- Cargando -->
+                    <div
+                        id="cargandoAuditoria"
+                        class="text-center py-4"
+                    >
+
+                        <div
+                            class="spinner-border"
+                            style="color: var(--uns-rojo);"
+                            role="status"
+                        ></div>
+
+                        <p class="text-muted mt-2 mb-0">
+                            Cargando auditoría...
+                        </p>
+
+                    </div>
+
+
+                    <!-- Sin registros -->
+                    <div
+                        id="sinAuditoria"
+                        class="text-center text-muted py-4 d-none"
+                    >
+
+                        <i class="bi bi-clock-history fs-2"></i>
+
+                        <p class="mt-2 mb-0">
+                            No hay registros de auditoría.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Tabla -->
+                    <div
+                        id="contenedorAuditoria"
+                        class="table-responsive d-none"
+                    >
+
+                        <table class="table table-hover align-middle">
+
+                            <thead>
+
+                                <tr class="table-light">
+
+                                    <th>Fecha</th>
+                                    <th>Usuario</th>
+                                    <th>Acción</th>
+                                    <th>Módulo</th>
+                                    <th>Detalle</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="cuerpoAuditoria">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

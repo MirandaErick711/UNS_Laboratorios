@@ -7,173 +7,422 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
+
     cargarPendientes();
     cargarIndicadores();
+
 });
 
+
 /**
- * Obtiene las reservas pendientes desde el backend y las renderiza.
+ * =========================================================
+ * CARGAR RESERVAS PENDIENTES
+ * =========================================================
  */
+
 async function cargarPendientes() {
-    const cargando = document.getElementById('cargando');
-    const tabla = document.getElementById('tablaPendientes');
-    const estadoVacio = document.getElementById('estadoVacio');
+
+    const cargando =
+        document.getElementById('cargando');
+
+    const tabla =
+        document.getElementById('tablaPendientes');
+
+    const cuerpo =
+        document.getElementById('cuerpoTablaPendientes');
+
+    const estadoVacio =
+        document.getElementById('estadoVacio');
 
     try {
-        const response = await fetch('../api/reservas_pendientes.php', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
 
-        const data = await response.json();
+        const respuesta =
+            await fetch('../api/reservas.php?pendientes=1');
+
+        const resultado =
+            await respuesta.json();
+
+        console.log(
+            'Respuesta pendientes:',
+            resultado
+        );
+
+        if (!resultado.success) {
+
+            throw new Error(
+                resultado.message ||
+                'No se pudieron cargar las reservas'
+            );
+
+        }
 
         cargando.classList.add('d-none');
 
-        if (!data.success) {
-            mostrarAlertaGeneral(data.message || 'No se pudieron cargar las solicitudes.', 'danger');
+        cuerpo.innerHTML = '';
+
+        if (
+            !resultado.data ||
+            resultado.data.length === 0
+        ) {
+
+            tabla.classList.add('d-none');
+            estadoVacio.style.display = 'block';
+
             return;
         }
 
-        if (data.data.length === 0) {
-            estadoVacio.style.display = 'block';
-            return;
-        }
+        estadoVacio.style.display = 'none';
 
         tabla.classList.remove('d-none');
-        renderizarFilas(data.data);
+
+        renderizarFilas(resultado.data);
 
     } catch (error) {
-        console.error('Error al cargar pendientes:', error);
+
+        console.error(
+            'Error al cargar reservas:',
+            error
+        );
+
         cargando.classList.add('d-none');
-        mostrarAlertaGeneral('Error de conexión con el servidor.', 'danger');
+
+        estadoVacio.style.display = 'block';
+
+        estadoVacio.innerHTML = `
+            <i class="bi bi-exclamation-circle fs-2"></i>
+
+            <p class="mt-2 mb-0">
+                No se pudieron cargar las reservas.
+            </p>
+        `;
+
     }
+
 }
 
-/**
- * Construye y pinta las filas de la tabla a partir del arreglo de reservas.
- */
-function renderizarFilas(reservas) {
-    const cuerpo = document.getElementById('cuerpoTablaPendientes');
-    cuerpo.innerHTML = ''; // Limpiamos por si se vuelve a llamar
 
-    reservas.forEach(reserva => {
-        const fila = document.createElement('tr');
-        fila.id = `fila-reserva-${reserva.id_reserva}`;
+/**
+ * =========================================================
+ * RENDERIZAR FILAS
+ * =========================================================
+ */
+
+function renderizarFilas(reservas) {
+
+    const cuerpo =
+        document.getElementById(
+            'cuerpoTablaPendientes'
+        );
+
+    cuerpo.innerHTML = '';
+
+    reservas.forEach(function (reserva) {
+
+        const fila =
+            document.createElement('tr');
+
+        fila.dataset.id =
+            reserva.id_reserva;
 
         fila.innerHTML = `
-            <td>${escaparHtml(reserva.nombre_docente)}</td>
-            <td><span class="badge bg-secondary">${escaparHtml(reserva.nombre_laboratorio)}</span></td>
-            <td>${formatearFecha(reserva.fecha)}</td>
-            <td>${reserva.hora_inicio.substring(0, 5)} - ${reserva.hora_fin.substring(0, 5)}</td>
-            <td class="text-truncate" style="max-width: 220px;" title="${escaparHtml(reserva.motivo)}">
+
+            <td>
+                ${escaparHtml(reserva.nombre_laboratorio)}
+            </td>
+
+            <td>
+                ${escaparHtml(reserva.usuario)}
+            </td>
+
+            <td>
+                ${escaparHtml(reserva.fecha)}
+            </td>
+
+            <td>
+                ${escaparHtml(reserva.hora_inicio)}
+                -
+                ${escaparHtml(reserva.hora_fin)}
+            </td>
+
+            <td>
                 ${escaparHtml(reserva.motivo)}
             </td>
-            <td class="text-center">
-                <button class="btn btn-success btn-sm me-1 btn-aprobar" data-id="${reserva.id_reserva}">
-                    <i class="bi bi-check-lg"></i> Aprobar
-                </button>
-                <button class="btn btn-danger btn-sm btn-rechazar" data-id="${reserva.id_reserva}">
-                    <i class="bi bi-x-lg"></i> Rechazar
-                </button>
+
+            <td>
+                <span class="badge badge-pendiente">
+                    Pendiente
+                </span>
             </td>
+
+            <td class="text-center">
+
+                <button
+                    type="button"
+                    class="btn btn-success btn-sm me-1"
+                    onclick="procesarReserva(${reserva.id_reserva}, 'Aprobada')"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Aprobar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    onclick="procesarReserva(${reserva.id_reserva}, 'Rechazada')"
+                >
+                    <i class="bi bi-x-lg"></i>
+                    Rechazar
+                </button>
+
+            </td>
+
         `;
 
         cuerpo.appendChild(fila);
+
     });
 
-    // Delegamos los eventos de los botones recién creados
-    document.querySelectorAll('.btn-aprobar').forEach(btn => {
-        btn.addEventListener('click', () => procesarReserva(btn.dataset.id, 'Aprobada'));
-    });
-
-    document.querySelectorAll('.btn-rechazar').forEach(btn => {
-        btn.addEventListener('click', () => procesarReserva(btn.dataset.id, 'Rechazada'));
-    });
 }
 
+
 /**
- * Envía el cambio de estado (Aprobada/Rechazada) al backend
- * y, si es exitoso, elimina la fila de la tabla con una transición suave.
+ * =========================================================
+ * PROCESAR RESERVA
+ * =========================================================
  */
-async function procesarReserva(idReserva, nuevoEstado) {
-    const fila = document.getElementById(`fila-reserva-${idReserva}`);
-    fila.classList.add('fila-procesando'); // feedback visual inmediato
+
+async function procesarReserva(
+    idReserva,
+    nuevoEstado
+) {
+
+    const fila =
+        document.querySelector(
+            `#tablaPendientes tbody tr[data-id="${idReserva}"]`
+        );
+
+    if (!fila) {
+        return;
+    }
+
+    fila.classList.add('fila-procesando');
 
     try {
-        const response = await fetch('../api/reservas.php', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id_reserva: idReserva,
-                estado: nuevoEstado
-            })
-        });
 
-        const data = await response.json();
+        const respuesta =
+            await fetch('../api/reservas.php', {
 
-        if (data.success) {
+                method: 'PATCH',
 
-            // Actualizar indicadores inmediatamente
-            cargarIndicadores();
+                headers: {
+                    'Content-Type': 'application/json'
+                },
 
-            // Animación breve de salida antes de remover la fila del DOM
-            fila.style.transform = 'translateX(30px)';
-            fila.style.opacity = '0';
+                body: JSON.stringify({
 
-            setTimeout(() => {
-                fila.remove();
-                verificarTablaVacia();
-            }, 300);
+                    id_reserva: idReserva,
 
-        } else {
-            fila.classList.remove('fila-procesando');
-            mostrarAlertaGeneral(data.message || 'No se pudo procesar la solicitud.', 'danger');
+                    estado: nuevoEstado
+
+                })
+
+            });
+
+        const data =
+            await respuesta.json();
+
+        console.log(
+            'Respuesta procesar reserva:',
+            data
+        );
+
+        if (!data.success) {
+
+            throw new Error(
+                data.message ||
+                'No se pudo procesar la reserva'
+            );
+
         }
 
+        cargarIndicadores();
+
+        fila.style.transform =
+            'translateX(30px)';
+
+        fila.style.opacity = '0';
+
+        setTimeout(function () {
+
+            fila.remove();
+
+            verificarTablaVacia();
+
+        }, 300);
+
+        mostrarAlertaGeneral(
+            data.message ||
+            'Reserva procesada correctamente.',
+            'success'
+        );
+
     } catch (error) {
-        console.error('Error al procesar reserva:', error);
-        fila.classList.remove('fila-procesando');
-        mostrarAlertaGeneral('Error de conexión con el servidor.', 'danger');
+
+        console.error(
+            'Error al procesar reserva:',
+            error
+        );
+
+        fila.classList.remove(
+            'fila-procesando'
+        );
+
+        mostrarAlertaGeneral(
+            error.message ||
+            'No se pudo procesar la reserva.',
+            'danger'
+        );
+
     }
+
 }
 
+
 /**
- * Si ya no quedan filas en la tabla, mostramos el estado "vacío".
+ * =========================================================
+ * VERIFICAR SI LA TABLA QUEDO VACIA
+ * =========================================================
  */
+
 function verificarTablaVacia() {
-    const cuerpo = document.getElementById('cuerpoTablaPendientes');
-    if (cuerpo.children.length === 0) {
-        document.getElementById('tablaPendientes').classList.add('d-none');
-        document.getElementById('estadoVacio').style.display = 'block';
+
+    const cuerpo =
+        document.getElementById(
+            'cuerpoTablaPendientes'
+        );
+
+    const tabla =
+        document.getElementById(
+            'tablaPendientes'
+        );
+
+    const estadoVacio =
+        document.getElementById(
+            'estadoVacio'
+        );
+
+    if (
+        !cuerpo ||
+        cuerpo.children.length === 0
+    ) {
+
+        tabla.classList.add('d-none');
+
+        estadoVacio.style.display =
+            'block';
+
     }
+
 }
 
-function mostrarAlertaGeneral(mensaje, tipo) {
-    const alertBox = document.getElementById('alertaGeneral');
-    alertBox.textContent = mensaje;
-    alertBox.className = `alert alert-${tipo} py-2`;
-    alertBox.classList.remove('d-none');
-
-    setTimeout(() => alertBox.classList.add('d-none'), 4000);
-}
 
 /**
- * Formatea 'YYYY-MM-DD' a un formato más legible, ej: "15 sept. 2026".
+ * =========================================================
+ * MOSTRAR ALERTA GENERAL
+ * =========================================================
  */
-function formatearFecha(fechaSQL) {
-    const fecha = new Date(fechaSQL + 'T00:00:00');
-    return fecha.toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' });
+
+function mostrarAlertaGeneral(
+    mensaje,
+    tipo
+) {
+
+    const alerta =
+        document.getElementById(
+            'alertaGeneral'
+        );
+
+    if (!alerta) {
+        return;
+    }
+
+    alerta.className =
+        `alert alert-${tipo} py-2`;
+
+    alerta.textContent =
+        mensaje;
+
+    alerta.classList.remove(
+        'd-none'
+    );
+
+    setTimeout(function () {
+
+        alerta.classList.add(
+            'd-none'
+        );
+
+    }, 4000);
+
 }
 
+
 /**
- * Escapa texto antes de insertarlo en innerHTML, previniendo XSS
- * en caso de que un motivo contenga caracteres HTML.
+ * =========================================================
+ * FORMATEAR FECHA
+ * =========================================================
  */
+
+function formatearFecha(fecha) {
+
+    if (!fecha) {
+        return '';
+    }
+
+    const partes =
+        fecha.split('-');
+
+    if (partes.length !== 3) {
+        return fecha;
+    }
+
+    return (
+        partes[2] +
+        '/' +
+        partes[1] +
+        '/' +
+        partes[0]
+    );
+
+}
+
+
+/**
+ * =========================================================
+ * ESCAPAR HTML
+ * =========================================================
+ */
+
 function escaparHtml(texto) {
-    const div = document.createElement('div');
-    div.textContent = texto ?? '';
-    return div.innerHTML;
+
+    if (
+        texto === null ||
+        texto === undefined
+    ) {
+
+        return '';
+
+    }
+
+    return String(texto)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
 }
+
 
 /**
  * =========================================================
@@ -183,88 +432,137 @@ function escaparHtml(texto) {
 
 async function cargarIndicadores() {
 
-    const cargando =
-        document.getElementById('cargandoIndicadores');
-
-    const tabla =
-        document.getElementById('tablaUsoLaboratorios');
-
     try {
 
-        const response = await fetch(
-            '../api/estadisticas.php',
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
+        const respuesta =
+            await fetch(
+                '../api/estadisticas.php'
+            );
+
+        const resultado =
+            await respuesta.json();
+
+        console.log(
+            'Respuesta indicadores:',
+            resultado
         );
 
-
-        const data = await response.json();
-
-
-        if (!response.ok || !data.success) {
+        if (!resultado.success) {
 
             throw new Error(
-                data.message ||
-                'No se pudieron cargar los indicadores.'
+                resultado.message ||
+                'No se pudieron cargar los indicadores'
             );
+
+        }
+
+        const datos =
+            resultado.data;
+
+        if (datos.laboratorios) {
+
+            const total =
+                datos.laboratorios.total;
+
+            const operativos =
+                datos.laboratorios.operativos;
+
+            const mantenimiento =
+                datos.laboratorios.mantenimiento;
+
+            const inactivos =
+                datos.laboratorios.inactivos;
+
+            const elementoOperativos =
+                document.getElementById(
+                    'indicadorOperativos'
+                );
+
+            const elementoMantenimiento =
+                document.getElementById(
+                    'indicadorMantenimiento'
+                );
+
+            if (elementoOperativos) {
+
+                elementoOperativos.textContent =
+                    operativos;
+
+            }
+
+            if (elementoMantenimiento) {
+
+                elementoMantenimiento.textContent =
+                    mantenimiento;
+
+            }
+
         }
 
 
-        const indicadores =
-            data.data;
+        if (
+            datos.reservas_pendientes !==
+            undefined
+        ) {
+
+            const elementoPendientes =
+                document.getElementById(
+                    'indicadorPendientes'
+                );
+
+            if (elementoPendientes) {
+
+                elementoPendientes.textContent =
+                    datos.reservas_pendientes;
+
+            }
+
+        }
 
 
-        // =====================================================
-        // INDICADORES GENERALES
-        // =====================================================
+        if (
+            datos.reservas_aprobadas_mes !==
+            undefined
+        ) {
 
-        document.getElementById(
-            'indicadorOperativos'
-        ).textContent =
-            indicadores.laboratorios.laboratorios_operativos;
+            const elementoAprobadas =
+                document.getElementById(
+                    'indicadorAprobadas'
+                );
 
+            if (elementoAprobadas) {
 
-        document.getElementById(
-            'indicadorMantenimiento'
-        ).textContent =
-            indicadores.laboratorios.laboratorios_mantenimiento;
+                elementoAprobadas.textContent =
+                    datos.reservas_aprobadas_mes;
 
+            }
 
-        document.getElementById(
-            'indicadorPendientes'
-        ).textContent =
-            indicadores.reservas_pendientes;
+        }
 
 
-        document.getElementById(
-            'indicadorAprobadas'
-        ).textContent =
-            indicadores.reservas_aprobadas_mes;
-            
-        document.getElementById('indicadorRechazadas').textContent =
-        indicadores.reservas_rechazadas_mes;
+        if (
+            datos.reservas_rechazadas_mes !==
+            undefined
+        ) {
 
-        // =====================================================
-        // TABLA DE USO
-        // =====================================================
+            const elementoRechazadas =
+                document.getElementById(
+                    'indicadorRechazadas'
+                );
+
+            if (elementoRechazadas) {
+
+                elementoRechazadas.textContent =
+                    datos.reservas_rechazadas_mes;
+
+            }
+
+        }
+
 
         renderizarUsoLaboratorios(
-            indicadores.uso_por_laboratorio
+            datos.uso_por_laboratorio
         );
-
-
-        if (cargando) {
-            cargando.classList.add('d-none');
-        }
-
-        if (tabla) {
-            tabla.classList.remove('d-none');
-        }
-
 
     } catch (error) {
 
@@ -273,114 +571,312 @@ async function cargarIndicadores() {
             error
         );
 
-        if (cargando) {
-            cargando.classList.add('d-none');
-        }
-
-        const cuerpo =
-            document.getElementById(
-                'cuerpoUsoLaboratorios'
-            );
-
-        if (cuerpo) {
-
-            cuerpo.innerHTML = `
-                <tr>
-                    <td
-                        colspan="3"
-                        class="text-center text-danger py-4"
-                    >
-                        No se pudieron cargar los indicadores.
-                    </td>
-                </tr>
-            `;
-
-            tabla.classList.remove('d-none');
-        }
     }
+
 }
 
 
 /**
  * =========================================================
- * MOSTRAR USO POR LABORATORIO
+ * RENDERIZAR USO DE LABORATORIOS
  * =========================================================
  */
 
-function renderizarUsoLaboratorios(laboratorios) {
+function renderizarUsoLaboratorios(
+    laboratorios
+) {
 
     const cuerpo =
         document.getElementById(
             'cuerpoUsoLaboratorios'
         );
+
     if (!cuerpo) {
         return;
     }
 
     cuerpo.innerHTML = '';
 
-    if (!laboratorios || laboratorios.length === 0) {
+    if (
+        !laboratorios ||
+        laboratorios.length === 0
+    ) {
 
         cuerpo.innerHTML = `
+
             <tr>
+
                 <td
                     colspan="3"
                     class="text-center text-muted py-4"
                 >
                     No hay laboratorios registrados.
                 </td>
+
             </tr>
+
         `;
 
         return;
     }
 
 
-    laboratorios.forEach(function (laboratorio) {
+    laboratorios.forEach(
+        function (laboratorio) {
 
-        let badgeEstado = '';
+            let badgeEstado = '';
 
-        if (laboratorio.estado === 'Operativo') {
 
-            badgeEstado =
-                '<span class="badge bg-success">Operativo</span>';
+            if (
+                laboratorio.estado ===
+                'Operativo'
+            ) {
 
-        } else if (
-            laboratorio.estado === 'Mantenimiento'
-        ) {
+                badgeEstado =
+                    '<span class="badge bg-success">Operativo</span>';
 
-            badgeEstado =
-                '<span class="badge bg-warning text-dark">Mantenimiento</span>';
+            } else if (
+                laboratorio.estado ===
+                'Mantenimiento'
+            ) {
 
-        } else {
+                badgeEstado =
+                    '<span class="badge bg-warning text-dark">Mantenimiento</span>';
 
-            badgeEstado =
-                '<span class="badge bg-secondary">' +
-                escaparHtml(laboratorio.estado) +
-                '</span>';
+            } else {
+
+                badgeEstado =
+                    '<span class="badge bg-secondary">' +
+                    escaparHtml(
+                        laboratorio.estado
+                    ) +
+                    '</span>';
+
+            }
+
+
+            cuerpo.innerHTML += `
+
+                <tr>
+
+                    <td class="fw-semibold">
+                        ${escaparHtml(
+                            laboratorio.nombre
+                        )}
+                    </td>
+
+                    <td>
+                        ${badgeEstado}
+                    </td>
+
+                    <td class="text-center">
+
+                        <span
+                            class="badge bg-primary rounded-pill"
+                        >
+                            ${laboratorio.reservas_mes}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+}
+
+/**
+ * =========================================================
+ * CARGAR AUDITORIA
+ * =========================================================
+ */
+
+async function cargarAuditoria() {
+
+    const cargando =
+        document.getElementById(
+            'cargandoAuditoria'
+        );
+
+    const sinAuditoria =
+        document.getElementById(
+            'sinAuditoria'
+        );
+
+    const contenedor =
+        document.getElementById(
+            'contenedorAuditoria'
+        );
+
+    const cuerpo =
+        document.getElementById(
+            'cuerpoAuditoria'
+        );
+
+
+    try {
+
+        cargando.classList.remove(
+            'd-none'
+        );
+
+        sinAuditoria.classList.add(
+            'd-none'
+        );
+
+        contenedor.classList.add(
+            'd-none'
+        );
+
+
+        const respuesta =
+            await fetch(
+                '../api/auditoria.php'
+            );
+
+
+        const resultado =
+            await respuesta.json();
+
+
+        console.log(
+            'Respuesta auditoria:',
+            resultado
+        );
+
+
+        if (!resultado.success) {
+
+            throw new Error(
+                resultado.message ||
+                'Error al cargar auditoria'
+            );
+
         }
 
 
-        cuerpo.innerHTML += `
-            <tr>
+        cargando.classList.add(
+            'd-none'
+        );
 
-                <td class="fw-semibold">
-                    ${escaparHtml(laboratorio.nombre)}
-                </td>
 
-                <td>
-                    ${badgeEstado}
-                </td>
+        cuerpo.innerHTML = '';
 
-                <td class="text-center">
 
-                    <span class="badge bg-primary rounded-pill">
-                        ${laboratorio.reservas_mes}
-                    </span>
+        if (
+            !resultado.data ||
+            resultado.data.length === 0
+        ) {
 
-                </td>
+            sinAuditoria.classList.remove(
+                'd-none'
+            );
 
-            </tr>
+            return;
+
+        }
+
+
+        contenedor.classList.remove(
+            'd-none'
+        );
+
+
+        resultado.data.forEach(
+            function (registro) {
+
+                const fila =
+                    document.createElement(
+                        'tr'
+                    );
+
+
+                fila.innerHTML = `
+
+                    <td>
+                        ${escaparHtml(
+                            registro.fecha
+                        )}
+                    </td>
+
+                    <td>
+                        ${escaparHtml(
+                            registro.usuario
+                        )}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="badge bg-secondary"
+                        >
+                            ${escaparHtml(
+                                registro.accion
+                            )}
+                        </span>
+
+                    </td>
+
+                    <td>
+                        ${escaparHtml(
+                            registro.modulo
+                        )}
+                    </td>
+
+                    <td>
+                        ${escaparHtml(
+                            registro.detalle
+                        )}
+                    </td>
+
+                `;
+
+
+                cuerpo.appendChild(
+                    fila
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al cargar auditoria:',
+            error
+        );
+
+
+        cargando.classList.add(
+            'd-none'
+        );
+
+        contenedor.classList.add(
+            'd-none'
+        );
+
+
+        sinAuditoria.classList.remove(
+            'd-none'
+        );
+
+
+        sinAuditoria.innerHTML = `
+
+            <i
+                class="bi bi-exclamation-circle fs-2"
+            ></i>
+
+            <p class="mt-2 mb-0">
+                No se pudo cargar la auditoría.
+            </p>
+
         `;
-    });
+
+    }
+
 }
