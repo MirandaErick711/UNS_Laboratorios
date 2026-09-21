@@ -459,19 +459,20 @@ async function cargarIndicadores() {
         const datos =
             resultado.data;
 
+
+        /**
+         * =====================================================
+         * INDICADORES DE LABORATORIOS
+         * =====================================================
+         */
+
         if (datos.laboratorios) {
 
-            const total =
-                datos.laboratorios.total;
-
             const operativos =
-                datos.laboratorios.operativos;
+                datos.laboratorios.laboratorios_operativos;
 
             const mantenimiento =
-                datos.laboratorios.mantenimiento;
-
-            const inactivos =
-                datos.laboratorios.inactivos;
+                datos.laboratorios.laboratorios_mantenimiento;
 
             const elementoOperativos =
                 document.getElementById(
@@ -500,6 +501,12 @@ async function cargarIndicadores() {
         }
 
 
+        /**
+         * =====================================================
+         * RESERVAS PENDIENTES
+         * =====================================================
+         */
+
         if (
             datos.reservas_pendientes !==
             undefined
@@ -519,6 +526,12 @@ async function cargarIndicadores() {
 
         }
 
+
+        /**
+         * =====================================================
+         * RESERVAS APROBADAS DEL MES
+         * =====================================================
+         */
 
         if (
             datos.reservas_aprobadas_mes !==
@@ -540,6 +553,12 @@ async function cargarIndicadores() {
         }
 
 
+        /**
+         * =====================================================
+         * RESERVAS RECHAZADAS DEL MES
+         * =====================================================
+         */
+
         if (
             datos.reservas_rechazadas_mes !==
             undefined
@@ -559,6 +578,12 @@ async function cargarIndicadores() {
 
         }
 
+
+        /**
+         * =====================================================
+         * USO DE LABORATORIOS
+         * =====================================================
+         */
 
         renderizarUsoLaboratorios(
             datos.uso_por_laboratorio
@@ -582,109 +607,115 @@ async function cargarIndicadores() {
  * =========================================================
  */
 
-function renderizarUsoLaboratorios(
-    laboratorios
-) {
+function renderizarUsoLaboratorios(laboratorios) {
 
     const cuerpo =
         document.getElementById(
             'cuerpoUsoLaboratorios'
         );
 
-    if (!cuerpo) {
+    const tabla =
+        document.getElementById(
+            'tablaUsoLaboratorios'
+        );
+
+    const cargando =
+        document.getElementById(
+            'cargandoIndicadores'
+        );
+
+    if (!cuerpo || !tabla || !cargando) {
+
+        console.error(
+            'No se encontraron los elementos de la tabla de uso.'
+        );
+
         return;
     }
 
+    // Ocultar mensaje de carga
+    cargando.classList.add('d-none');
+
+    // Mostrar tabla
+    tabla.classList.remove('d-none');
+
+    // Limpiar contenido anterior
     cuerpo.innerHTML = '';
 
+    // Verificar si existen datos
     if (
         !laboratorios ||
         laboratorios.length === 0
     ) {
 
         cuerpo.innerHTML = `
-
             <tr>
-
                 <td
                     colspan="3"
                     class="text-center text-muted py-4"
                 >
                     No hay laboratorios registrados.
                 </td>
-
             </tr>
-
         `;
 
         return;
     }
 
+    // Crear filas
+    laboratorios.forEach(function (laboratorio) {
 
-    laboratorios.forEach(
-        function (laboratorio) {
+        let badgeEstado = '';
 
-            let badgeEstado = '';
+        if (
+            laboratorio.estado === 'Operativo'
+        ) {
 
+            badgeEstado =
+                '<span class="badge bg-success">Operativo</span>';
 
-            if (
-                laboratorio.estado ===
-                'Operativo'
-            ) {
+        } else if (
+            laboratorio.estado === 'Mantenimiento'
+        ) {
 
-                badgeEstado =
-                    '<span class="badge bg-success">Operativo</span>';
+            badgeEstado =
+                '<span class="badge bg-warning text-dark">Mantenimiento</span>';
 
-            } else if (
-                laboratorio.estado ===
-                'Mantenimiento'
-            ) {
+        } else {
 
-                badgeEstado =
-                    '<span class="badge bg-warning text-dark">Mantenimiento</span>';
-
-            } else {
-
-                badgeEstado =
-                    '<span class="badge bg-secondary">' +
-                    escaparHtml(
-                        laboratorio.estado
-                    ) +
-                    '</span>';
-
-            }
-
-
-            cuerpo.innerHTML += `
-
-                <tr>
-
-                    <td class="fw-semibold">
-                        ${escaparHtml(
-                            laboratorio.nombre
-                        )}
-                    </td>
-
-                    <td>
-                        ${badgeEstado}
-                    </td>
-
-                    <td class="text-center">
-
-                        <span
-                            class="badge bg-primary rounded-pill"
-                        >
-                            ${laboratorio.reservas_mes}
-                        </span>
-
-                    </td>
-
-                </tr>
-
-            `;
+            badgeEstado =
+                '<span class="badge bg-secondary">' +
+                escaparHtml(laboratorio.estado) +
+                '</span>';
 
         }
-    );
+
+        const fila =
+            document.createElement('tr');
+
+        fila.innerHTML = `
+
+            <td class="fw-semibold">
+                ${escaparHtml(
+                    laboratorio.nombre
+                )}
+            </td>
+
+            <td>
+                ${badgeEstado}
+            </td>
+
+            <td class="text-center">
+                <span class="badge bg-primary rounded-pill">
+                    ${laboratorio.reservas_mes}
+                </span>
+            </td>
+
+        `;
+
+        cuerpo.appendChild(fila);
+
+    });
 
 }
 
@@ -696,103 +727,110 @@ function renderizarUsoLaboratorios(
 
 async function cargarAuditoria() {
 
+    console.log('1. cargarAuditoria() inicio');
+
     const cargando =
-        document.getElementById(
-            'cargandoAuditoria'
-        );
+        document.getElementById('cargandoAuditoria');
 
     const sinAuditoria =
-        document.getElementById(
-            'sinAuditoria'
-        );
+        document.getElementById('sinAuditoria');
 
     const contenedor =
-        document.getElementById(
-            'contenedorAuditoria'
-        );
+        document.getElementById('contenedorAuditoria');
 
     const cuerpo =
-        document.getElementById(
-            'cuerpoAuditoria'
-        );
+        document.getElementById('cuerpoAuditoria');
 
+    console.log('2. Elementos:', {
+        cargando: cargando,
+        sinAuditoria: sinAuditoria,
+        contenedor: contenedor,
+        cuerpo: cuerpo
+    });
 
     try {
 
-        cargando.classList.remove(
-            'd-none'
-        );
+        cargando.classList.remove('d-none');
+        sinAuditoria.classList.add('d-none');
+        contenedor.classList.add('d-none');
 
-        sinAuditoria.classList.add(
-            'd-none'
-        );
-
-        contenedor.classList.add(
-            'd-none'
-        );
-
+        console.log('3. Antes del fetch');
 
         const respuesta =
-            await fetch(
-                '../api/auditoria.php'
-            );
-
-
-        const resultado =
-            await respuesta.json();
-
+            await fetch('../api/auditoria.php');
 
         console.log(
-            'Respuesta auditoria:',
-            resultado
+            '4. Fetch terminado',
+            respuesta.status,
+            respuesta.statusText
         );
 
+        const texto =
+            await respuesta.text();
+
+        console.log(
+            '5. Respuesta RAW:',
+            texto
+        );
+
+        const resultado =
+            JSON.parse(texto);
+
+        console.log(
+            '6. JSON convertido:',
+            resultado
+        );
 
         if (!resultado.success) {
 
             throw new Error(
                 resultado.message ||
-                'Error al cargar auditoria'
+                'La API devolvio success=false'
             );
 
         }
 
+        console.log('7. API correcta');
 
-        cargando.classList.add(
-            'd-none'
-        );
-
+        cargando.classList.add('d-none');
 
         cuerpo.innerHTML = '';
-
 
         if (
             !resultado.data ||
             resultado.data.length === 0
         ) {
 
+            console.log(
+                '8. No hay registros'
+            );
+
             sinAuditoria.classList.remove(
                 'd-none'
             );
 
             return;
-
         }
 
+        console.log(
+            '8. Registros encontrados:',
+            resultado.data.length
+        );
 
         contenedor.classList.remove(
             'd-none'
         );
 
-
         resultado.data.forEach(
-            function (registro) {
+            function(registro) {
+
+                console.log(
+                    '9. Registro:',
+                    registro
+                );
 
                 const fila =
-                    document.createElement(
-                        'tr'
-                    );
-
+                    document.createElement('tr');
 
                 fila.innerHTML = `
 
@@ -809,15 +847,11 @@ async function cargarAuditoria() {
                     </td>
 
                     <td>
-
-                        <span
-                            class="badge bg-secondary"
-                        >
+                        <span class="badge bg-secondary">
                             ${escaparHtml(
                                 registro.accion
                             )}
                         </span>
-
                     </td>
 
                     <td>
@@ -834,22 +868,21 @@ async function cargarAuditoria() {
 
                 `;
 
-
-                cuerpo.appendChild(
-                    fila
-                );
+                cuerpo.appendChild(fila);
 
             }
         );
 
+        console.log(
+            '10. Auditoria cargada correctamente'
+        );
 
     } catch (error) {
 
         console.error(
-            'Error al cargar auditoria:',
+            'ERROR REAL AUDITORIA:',
             error
         );
-
 
         cargando.classList.add(
             'd-none'
@@ -859,24 +892,19 @@ async function cargarAuditoria() {
             'd-none'
         );
 
-
         sinAuditoria.classList.remove(
             'd-none'
         );
 
-
         sinAuditoria.innerHTML = `
 
-            <i
-                class="bi bi-exclamation-circle fs-2"
-            ></i>
+            <i class="bi bi-exclamation-circle fs-2"></i>
 
             <p class="mt-2 mb-0">
-                No se pudo cargar la auditoría.
+                Error: ${escaparHtml(error.message)}
             </p>
 
         `;
 
     }
-
 }

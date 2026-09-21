@@ -6,8 +6,12 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../controllers/ReservaController.php';
 
-// Validar sesión
+// -------------------------------------------------------
+// Verificar sesión
+// -------------------------------------------------------
+
 if (!isset($_SESSION['id_usuario'])) {
+
     http_response_code(401);
 
     echo json_encode([
@@ -27,12 +31,60 @@ try {
     switch ($metodo) {
 
         // =====================================================
-        // GET - Calendario
+        // GET
         // =====================================================
 
         case 'GET':
 
-            $eventos = $controller->listarParaCalendario();
+            // -------------------------------------------------
+            // GET ?pendientes=1
+            // Solo Responsable
+            // -------------------------------------------------
+
+            if (
+                isset($_GET['pendientes']) &&
+                $_GET['pendientes'] === '1'
+            ) {
+
+                if (
+                    $_SESSION['rol'] !== 'Responsable'
+                ) {
+
+                    http_response_code(403);
+
+                    echo json_encode([
+                        "success" => false,
+                        "message" =>
+                            "Solo un Responsable puede consultar las reservas pendientes."
+                    ], JSON_UNESCAPED_UNICODE);
+
+                    exit;
+                }
+
+                $reservas =
+                    $controller->listarPendientes();
+
+                http_response_code(200);
+
+                echo json_encode([
+                    "success" => true,
+                    "data" => $reservas
+                ], JSON_UNESCAPED_UNICODE);
+
+                break;
+            }
+
+            // -------------------------------------------------
+            // Calendario
+            // -------------------------------------------------
+
+            $idUsuario =
+                (int) $_SESSION['id_usuario'];
+
+            $eventos =
+                $controller->listarParaCalendario(
+                    $idUsuario
+                );
 
             http_response_code(200);
 
@@ -45,27 +97,32 @@ try {
 
 
         // =====================================================
-        // POST - Nueva reserva
+        // POST
         // =====================================================
 
         case 'POST':
 
-            if ($_SESSION['rol'] !== 'Docente') {
+            // Solo Docente puede crear reservas
+            if (
+                $_SESSION['rol'] !== 'Docente'
+            ) {
 
                 http_response_code(403);
 
                 echo json_encode([
                     "success" => false,
-                    "message" => "Solo los docentes pueden registrar reservas."
-                ]);
+                    "message" =>
+                        "Solo los docentes pueden registrar reservas."
+                ], JSON_UNESCAPED_UNICODE);
 
                 exit;
             }
 
-            $input = json_decode(
-                file_get_contents('php://input'),
-                true
-            );
+            $input =
+                json_decode(
+                    file_get_contents('php://input'),
+                    true
+                );
 
             if (!is_array($input)) {
 
@@ -73,18 +130,21 @@ try {
 
                 echo json_encode([
                     "success" => false,
-                    "message" => "Cuerpo de la peticion invalido."
+                    "message" =>
+                        "Cuerpo de la peticion invalido."
                 ]);
 
                 exit;
             }
 
-            $resultado = $controller->crear(
-                (int) $_SESSION['id_usuario'],
-                $input
-            );
+            $resultado =
+                $controller->crear(
+                    (int) $_SESSION['id_usuario'],
+                    $input
+                );
 
-            $httpCode = $resultado['http_code'] ?? 500;
+            $httpCode =
+                $resultado['http_code'] ?? 500;
 
             unset($resultado['http_code']);
 
@@ -99,27 +159,32 @@ try {
 
 
         // =====================================================
-        // PATCH - Aprobar / Rechazar
+        // PATCH
         // =====================================================
 
         case 'PATCH':
 
-            if ($_SESSION['rol'] !== 'Responsable') {
+            // Solo Responsable puede aprobar/rechazar
+            if (
+                $_SESSION['rol'] !== 'Responsable'
+            ) {
 
                 http_response_code(403);
 
                 echo json_encode([
                     "success" => false,
-                    "message" => "Solo un Responsable puede aprobar o rechazar reservas."
-                ]);
+                    "message" =>
+                        "Solo un Responsable puede aprobar o rechazar reservas."
+                ], JSON_UNESCAPED_UNICODE);
 
                 exit;
             }
 
-            $input = json_decode(
-                file_get_contents('php://input'),
-                true
-            );
+            $input =
+                json_decode(
+                    file_get_contents('php://input'),
+                    true
+                );
 
             if (
                 !is_array($input) ||
@@ -131,18 +196,21 @@ try {
 
                 echo json_encode([
                     "success" => false,
-                    "message" => "Debe indicar id_reserva y estado."
-                ]);
+                    "message" =>
+                        "Debe indicar id_reserva y estado."
+                ], JSON_UNESCAPED_UNICODE);
 
                 exit;
             }
 
-            $resultado = $controller->cambiarEstado(
-                (int) $input['id_reserva'],
-                $input['estado']
-            );
+            $resultado =
+                $controller->cambiarEstado(
+                    (int) $input['id_reserva'],
+                    $input['estado']
+                );
 
-            $httpCode = $resultado['http_code'] ?? 500;
+            $httpCode =
+                $resultado['http_code'] ?? 500;
 
             unset($resultado['http_code']);
 
@@ -156,14 +224,19 @@ try {
             break;
 
 
+        // =====================================================
+        // OTROS METODOS
+        // =====================================================
+
         default:
 
             http_response_code(405);
 
             echo json_encode([
                 "success" => false,
-                "message" => "Metodo no permitido."
-            ]);
+                "message" =>
+                    "Metodo no permitido."
+            ], JSON_UNESCAPED_UNICODE);
 
             break;
     }
@@ -179,7 +252,7 @@ try {
 
     echo json_encode([
         "success" => false,
-        "message" => "Error interno del servidor.",
-        "error" => $e->getMessage()
+        "message" =>
+            "Error interno del servidor."
     ], JSON_UNESCAPED_UNICODE);
 }
