@@ -16,7 +16,7 @@ class Reserva
         $this->conn = Database::getInstance()->getConnection();
     }
 
-    // Verifica si el laboratorio esta operativo
+    // Verifica si el buscarPorId() esta operativo
     public function laboratorioEstaOperativo(int $idLaboratorio): bool
     {
         $sql = "SELECT id_laboratorio
@@ -271,6 +271,9 @@ class Reserva
      *
      * Se usa antes de actualizar para confirmar que existe
      * y sigue en estado 'Pendiente'.
+     *
+     * También obtiene el correo del docente para una futura
+     * notificación mediante el correo institucional.
      */
     public function buscarPorId(int $idReserva): array|false
     {
@@ -283,10 +286,13 @@ class Reserva
                 r.hora_inicio,
                 r.hora_fin,
                 r.estado,
-                l.nombre AS nombre_laboratorio
+                l.nombre AS nombre_laboratorio,
+                u.correo AS correo_docente
             FROM reservas r
             INNER JOIN laboratorios l
                 ON l.id_laboratorio = r.id_laboratorio
+            INNER JOIN usuarios u
+                ON u.id_usuario = r.id_usuario
             WHERE r.id_reserva = :id_reserva
             LIMIT 1
         ";

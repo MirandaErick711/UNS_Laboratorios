@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../models/Reserva.php';
 require_once __DIR__ . '/../models/Aviso.php';
 require_once __DIR__ . '/../models/Auditoria.php';
+require_once __DIR__ . '/../services/CorreoInstitucional.php';
 
 /**
  * Controlador de Reservas
@@ -13,12 +14,14 @@ class ReservaController
     private Reserva $reservaModel;
     private Aviso $avisoModel;
     private Auditoria $auditoriaModel;
+    private CorreoInstitucional $correoInstitucional;
 
     public function __construct()
     {
         $this->reservaModel = new Reserva();
         $this->avisoModel = new Aviso();
         $this->auditoriaModel = new Auditoria();
+        $this->correoInstitucional = new CorreoInstitucional();
     }
 
     /**
@@ -56,7 +59,8 @@ class ReservaController
             return [
                 "success" => false,
                 "http_code" => 400,
-                "message" => "La hora de fin debe ser posterior a la hora de inicio."
+                "message" =>
+                    "La hora de fin debe ser posterior a la hora de inicio."
             ];
         }
 
@@ -78,7 +82,8 @@ class ReservaController
                 return [
                     "success" => false,
                     "http_code" => 409,
-                    "message" => "El laboratorio seleccionado se encuentra en mantenimiento."
+                    "message" =>
+                        "El laboratorio seleccionado se encuentra en mantenimiento."
                 ];
             }
 
@@ -97,7 +102,8 @@ class ReservaController
                 return [
                     "success" => false,
                     "http_code" => 409,
-                    "message" => "El laboratorio ya está reservado en ese horario. Elige otro rango."
+                    "message" =>
+                        "El horario seleccionado ya está reservado. Selecciona otro horario."
                 ];
             }
 
@@ -117,7 +123,8 @@ class ReservaController
             return [
                 "success" => true,
                 "http_code" => 201,
-                "message" => "Reserva registrada correctamente. Queda pendiente de aprobación.",
+                "message" =>
+                    "Reserva registrada correctamente. Queda pendiente de aprobación.",
                 "id_reserva" => $idReserva
             ];
 
@@ -281,17 +288,24 @@ class ReservaController
                 return [
                     "success" => false,
                     "http_code" => 409,
-                    "message" => "Esta reserva ya fue procesada anteriormente."
+                    "message" =>
+                        "Esta reserva ya fue procesada anteriormente."
                 ];
             }
 
-            // Actualizar estado
+            // -------------------------------------------------------
+            // ACTUALIZAR ESTADO
+            // -------------------------------------------------------
+
             $this->reservaModel->actualizarEstado(
                 $idReserva,
                 $nuevoEstado
             );
 
-            // Crear aviso para el docente
+            // -------------------------------------------------------
+            // CREAR AVISO PARA EL DOCENTE
+            // -------------------------------------------------------
+
             if ($nuevoEstado === 'Aprobada') {
 
                 $titulo = 'Reserva aprobada';
@@ -330,7 +344,10 @@ class ReservaController
                 $mensaje
             );
 
-            // Registrar auditoría
+            // -------------------------------------------------------
+            // REGISTRAR AUDITORÍA
+            // -------------------------------------------------------
+
             $this->auditoriaModel->registrar(
                 (int) $_SESSION['id_usuario'],
                 strtoupper(
@@ -343,7 +360,47 @@ class ReservaController
                 "{$reserva['nombre_laboratorio']} {$nuevoEstado}."
             );
 
+            // -------------------------------------------------------
+            // CONFIRMAR CAMBIOS
+            // -------------------------------------------------------
+
             $pdo->commit();
+
+            // -------------------------------------------------------
+            // CORREO INSTITUCIONAL
+            // -------------------------------------------------------
+            //
+            // El servicio actualmente no está disponible porque
+            // todavía no existe una conexión real con el correo
+            // institucional de la UNS.
+            //
+            // Si posteriormente se configura el servicio, esta
+            // misma llamada permitirá enviar el correo sin modificar
+            // el flujo principal de aprobación/rechazo.
+            //
+
+            if (
+                !empty($reserva['correo_docente']) &&
+                $this->correoInstitucional->estaDisponible()
+            ) {
+
+                $asunto =
+                    "Reserva {$nuevoEstado} - " .
+                    $reserva['nombre_laboratorio'];
+
+                $correoEnviado =
+                    $this->correoInstitucional->enviar(
+                        $reserva['correo_docente'],
+                        $asunto,
+                        $mensaje
+                    );
+
+                if (!$correoEnviado) {
+                    error_log(
+                        "No se pudo enviar el correo de la reserva #{$idReserva}."
+                    );
+                }
+            }
 
             return [
                 "success" => true,

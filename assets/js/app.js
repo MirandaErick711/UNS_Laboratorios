@@ -65,6 +65,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             height: 'auto',
 
+            titleFormat: {
+                year: 'numeric',
+                month: 'long'
+            },
+
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -126,6 +131,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         calendar.render();
+
+        // =======================================================
+        // CAMBIAR TITULO DEL CALENDARIO A MAYUSCULAS
+        // =======================================================
+
+        const tituloCalendario =
+            calendarEl.querySelector('.fc-toolbar-title');
+
+        if (tituloCalendario) {
+            tituloCalendario.textContent =
+                tituloCalendario.textContent.toUpperCase();
+        }
 
         // Guardamos el calendario
         window.calendarInstance = calendar;
