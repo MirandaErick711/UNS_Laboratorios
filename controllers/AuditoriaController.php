@@ -1,19 +1,14 @@
 <?php
-
 require_once __DIR__ . '/../models/Auditoria.php';
 
-class AuditoriaController
-{
+class AuditoriaController {
     private Auditoria $auditoriaModel;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->auditoriaModel = new Auditoria();
     }
 
-    /**
-     * Registrar una accion
-     */
+    // Registra una accion
     public function registrar(
         int $idUsuario,
         string $accion,
@@ -28,11 +23,8 @@ class AuditoriaController
         );
     }
 
-    /**
-     * Obtener registros de auditoria
-     */
-    public function listar(): array
-    {
+    // Obtiene los registros de auditoria
+    public function listar(): array {
         return $this->auditoriaModel->listar();
     }
 }

@@ -1,23 +1,14 @@
 <?php
-
 require_once __DIR__ . '/../config/Database.php';
 
-/**
- * Modelo Aviso
- * Gestiona los avisos internos dirigidos a los docentes.
- */
-class Aviso
-{
+class Aviso {
     private PDO $conn;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->conn = Database::getInstance()->getConnection();
     }
 
-    /**
-     * Crea un aviso para un usuario.
-     */
+    // Crea un aviso para un usuario
     public function crear(
         int $idUsuario,
         int $idReserva,
@@ -25,47 +16,24 @@ class Aviso
         string $mensaje
     ): int {
         $sql = "
-            INSERT INTO avisos (
-                id_usuario,
-                id_reserva,
-                titulo,
-                mensaje,
-                leido
-            )
-            VALUES (
-                :id_usuario,
-                :id_reserva,
-                :titulo,
-                :mensaje,
-                0
-            )
+            INSERT INTO avisos (id_usuario, id_reserva, titulo, mensaje, leido)
+            VALUES (:id_usuario, :id_reserva, :titulo, :mensaje, 0)
         ";
 
         $stmt = $this->conn->prepare($sql);
-
         $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
         $stmt->bindParam(':id_reserva', $idReserva, PDO::PARAM_INT);
         $stmt->bindParam(':titulo', $titulo, PDO::PARAM_STR);
         $stmt->bindParam(':mensaje', $mensaje, PDO::PARAM_STR);
-
         $stmt->execute();
 
         return (int) $this->conn->lastInsertId();
     }
 
-    /**
-     * Obtiene los avisos de un usuario.
-     */
-    public function listarPorUsuario(int $idUsuario): array
-    {
+    // Obtiene los avisos de un usuario
+    public function listarPorUsuario(int $idUsuario): array {
         $sql = "
-            SELECT
-                id_aviso,
-                id_reserva,
-                titulo,
-                mensaje,
-                leido,
-                fecha
+            SELECT id_aviso, id_reserva, titulo, mensaje, leido, fecha
             FROM avisos
             WHERE id_usuario = :id_usuario
             ORDER BY fecha DESC
@@ -78,11 +46,8 @@ class Aviso
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Obtiene la cantidad de avisos no leidos.
-     */
-    public function contarNoLeidos(int $idUsuario): int
-    {
+    // Cuenta los avisos no leidos
+    public function contarNoLeidos(int $idUsuario): int {
         $sql = "
             SELECT COUNT(*)
             FROM avisos
@@ -97,11 +62,8 @@ class Aviso
         return (int) $stmt->fetchColumn();
     }
 
-    /**
-     * Marca todos los avisos del usuario como leidos.
-     */
-    public function marcarTodosComoLeidos(int $idUsuario): bool
-    {
+    // Marca los avisos como leidos
+    public function marcarTodosComoLeidos(int $idUsuario): bool {
         $sql = "
             UPDATE avisos
             SET leido = 1

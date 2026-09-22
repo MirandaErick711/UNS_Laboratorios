@@ -1,21 +1,10 @@
-/**
- * tecnico.js
- * Lógica del Dashboard del Técnico:
- *  - Carga laboratorios (para las tarjetas y el select del modal)
- *  - Carga el historial de incidencias
- *  - Registra nuevas incidencias y marca incidencias como resueltas
- */
-
+// Carga los datos al iniciar
 document.addEventListener('DOMContentLoaded', function () {
     cargarDatosIniciales();
-
     document.getElementById('formIncidencia').addEventListener('submit', registrarIncidencia);
 });
 
-/**
- * Un solo GET trae tanto las incidencias como los laboratorios,
- * evitando dos peticiones separadas al cargar la página.
- */
+// Carga laboratorios e incidencias
 async function cargarDatosIniciales() {
     try {
         const response = await fetch('../api/incidencias.php', { method: 'GET' });
@@ -29,15 +18,12 @@ async function cargarDatosIniciales() {
         renderizarLaboratorios(data.laboratorios);
         llenarSelectLaboratorios(data.laboratorios);
         renderizarIncidencias(data.incidencias);
-
     } catch (error) {
         console.error('Error al cargar datos iniciales:', error);
     }
 }
 
-/**
- * Pinta las tarjetas de estado de cada laboratorio.
- */
+// Muestra las tarjetas de laboratorios
 function renderizarLaboratorios(laboratorios) {
     const contenedor = document.getElementById('contenedorLaboratorios');
     contenedor.innerHTML = '';
@@ -72,9 +58,7 @@ function renderizarLaboratorios(laboratorios) {
     });
 }
 
-/**
- * Llena el <select> del modal de reporte con los laboratorios disponibles.
- */
+// Llena el select de laboratorios
 function llenarSelectLaboratorios(laboratorios) {
     const select = document.getElementById('id_laboratorio');
     select.innerHTML = '<option value="" selected disabled>Selecciona un laboratorio...</option>';
@@ -87,9 +71,7 @@ function llenarSelectLaboratorios(laboratorios) {
     });
 }
 
-/**
- * Pinta la tabla del historial de incidencias.
- */
+// Muestra el historial de incidencias
 function renderizarIncidencias(incidencias) {
     document.getElementById('cargandoIncidencias').classList.add('d-none');
     document.getElementById('tablaIncidencias').classList.remove('d-none');
@@ -105,7 +87,10 @@ function renderizarIncidencias(incidencias) {
     incidencias.forEach(inc => {
         const fila = document.createElement('tr');
         fila.id = `fila-incidencia-${inc.id_incidencia}`;
-        if (inc.estado === 'Resuelto') fila.classList.add('fila-resuelta');
+
+        if (inc.estado === 'Resuelto') {
+            fila.classList.add('fila-resuelta');
+        }
 
         const badgeEstado = inc.estado === 'Resuelto'
             ? '<span class="badge bg-success">Resuelto</span>'
@@ -135,9 +120,7 @@ function renderizarIncidencias(incidencias) {
     });
 }
 
-/**
- * Envía el formulario de nueva incidencia.
- */
+// Registra una nueva incidencia
 async function registrarIncidencia(e) {
     e.preventDefault();
 
@@ -165,16 +148,16 @@ async function registrarIncidencia(e) {
 
         if (data.success) {
             mostrarAlertaModal(data.message, 'success');
+
             setTimeout(() => {
                 bootstrap.Modal.getInstance(document.getElementById('modalNuevaIncidencia')).hide();
                 document.getElementById('formIncidencia').reset();
                 ocultarAlertaModal();
-                cargarDatosIniciales(); // Refrescamos tarjetas + tabla
+                cargarDatosIniciales();
             }, 1000);
         } else {
             mostrarAlertaModal(data.message || 'No se pudo registrar la incidencia.', 'danger');
         }
-
     } catch (error) {
         console.error('Error al registrar incidencia:', error);
         mostrarAlertaModal('Error de conexión con el servidor.', 'danger');
@@ -185,12 +168,8 @@ async function registrarIncidencia(e) {
     }
 }
 
-/**
- * Marca una incidencia como resuelta (PATCH) y actualiza la UI sin recargar.
- */
+// Marca una incidencia como resuelta
 async function resolverIncidencia(idIncidencia) {
-    const fila = document.getElementById(`fila-incidencia-${idIncidencia}`);
-
     try {
         const response = await fetch('../api/incidencias.php', {
             method: 'PATCH',
@@ -201,16 +180,16 @@ async function resolverIncidencia(idIncidencia) {
         const data = await response.json();
 
         if (data.success) {
-            cargarDatosIniciales(); // Refrescamos todo: tarjetas de labs + tabla
+            cargarDatosIniciales();
         } else {
             alert(data.message || 'No se pudo resolver la incidencia.');
         }
-
     } catch (error) {
         console.error('Error al resolver incidencia:', error);
     }
 }
 
+// Muestra una alerta en el modal
 function mostrarAlertaModal(mensaje, tipo) {
     const alertBox = document.getElementById('incidenciaAlert');
     alertBox.textContent = mensaje;
@@ -224,7 +203,11 @@ function ocultarAlertaModal() {
 
 function formatearFecha(fechaSQL) {
     const fecha = new Date(fechaSQL.replace(' ', 'T'));
-    return fecha.toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' });
+    return fecha.toLocaleDateString('es-PE', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    });
 }
 
 function escaparHtml(texto) {

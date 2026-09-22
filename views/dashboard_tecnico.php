@@ -14,11 +14,9 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Técnico | Sistema de Reservas UNS</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="../assets/css/style.css" rel="stylesheet">
-
     <style>
         .fila-resuelta { opacity: 0.4; pointer-events: none; }
         .lab-card { border-left: 5px solid #ccc; }
@@ -28,7 +26,6 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
     </style>
 </head>
 <body class="bg-light">
-
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--uns-rojo);">
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold" href="#">
@@ -48,7 +45,6 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
 </nav>
 
 <div class="container-fluid px-4 py-4">
-
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div>
             <h4 class="fw-bold mb-0" style="color: var(--uns-rojo);">
@@ -61,12 +57,8 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
         </button>
     </div>
 
-    <!-- Estado de laboratorios (tarjetas) -->
-    <div class="row g-3 mb-4" id="contenedorLaboratorios">
-        <!-- Se llena dinámicamente vía JS -->
-    </div>
+    <div class="row g-3 mb-4" id="contenedorLaboratorios"></div>
 
-    <!-- Tabla de incidencias -->
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white fw-semibold" style="color: var(--uns-rojo);">
             Historial de Incidencias
@@ -94,7 +86,6 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
     </div>
 </div>
 
-<!-- Modal: Nueva Incidencia -->
 <div class="modal fade" id="modalNuevaIncidencia" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -107,18 +98,16 @@ $nombreCompleto = htmlspecialchars($_SESSION['nombres'] . ' ' . $_SESSION['apell
             <form id="formIncidencia">
                 <div class="modal-body">
                     <div id="incidenciaAlert" class="alert py-2 d-none"></div>
-
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Laboratorio afectado</label>
                         <select class="form-select" id="id_laboratorio" required>
                             <option value="" selected disabled>Selecciona un laboratorio...</option>
                         </select>
                     </div>
-
                     <div class="mb-2">
                         <label class="form-label fw-semibold">Descripción de la avería</label>
                         <textarea class="form-control" id="descripcion" rows="3"
-                                  placeholder="Ej: PC #05 no enciende / Sin conexión a internet en la red del lab" required></textarea>
+                            placeholder="Ej: PC #05 no enciende / Sin conexión a internet en la red del lab" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

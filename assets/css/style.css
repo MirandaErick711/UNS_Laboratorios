@@ -1,158 +1,85 @@
 :root {
-
     --uns-rojo: #a30000;
-
     --uns-rojo-oscuro: #7a0000;
-
     --uns-blanco: #ffffff;
-
     --uns-gris-texto: #333333;
-
 }
-
 
 body {
-
     font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-
-    background: linear-gradient(
-        135deg,
-        #fdfdfd 0%,
-        #f2f2f2 100%
-    );
-
+    background: linear-gradient(135deg, #fdfdfd 0%, #f2f2f2 100%);
     color: var(--uns-gris-texto);
-
     min-height: 100vh;
 }
 
-
-/* =========================================================
-   LOGIN
-   ========================================================= */
-
+/* Login */
 .login-wrapper {
-
     min-height: 100vh;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 }
 
-
 .login-card {
-
     background: var(--uns-blanco);
-
     border-radius: 12px;
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.12);
-
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     overflow: hidden;
-
     max-width: 900px;
-
     width: 100%;
 }
 
-
 .login-brand {
-
-    background: linear-gradient(
-        160deg,
-        var(--uns-rojo) 0%,
-        var(--uns-rojo-oscuro) 100%
-    );
-
+    background: linear-gradient(160deg, var(--uns-rojo) 0%, var(--uns-rojo-oscuro) 100%);
     color: var(--uns-blanco);
-
     padding: 3rem 2rem;
-
     display: flex;
-
     flex-direction: column;
-
     justify-content: center;
-
     align-items: center;
-
     text-align: center;
 }
 
-
 .login-brand img {
-
     width: 200px !important;
-
     height: auto !important;
-
     max-width: none !important;
-
     margin-bottom: 1rem;
 }
 
-
 .login-form-container {
-
     padding: 3rem 2.5rem;
 }
 
-
 .btn-uns {
-
     background-color: var(--uns-rojo);
-
     border-color: var(--uns-rojo);
-
     color: #fff;
-
     font-weight: 600;
-
     letter-spacing: 0.5px;
 }
 
-
 .btn-uns:hover {
-
     background-color: var(--uns-rojo-oscuro);
-
     border-color: var(--uns-rojo-oscuro);
 }
 
-
 .form-control:focus {
-
     border-color: var(--uns-rojo);
-
-    box-shadow:
-        0 0 0 0.2rem rgba(163, 0, 0, 0.15);
+    box-shadow: 0 0 0 0.2rem rgba(163, 0, 0, 0.15);
 }
 
-
 #loginAlert {
-
     display: none;
 }
 
-
-/* =========================================================
-   FULLCALENDAR
-   ========================================================= */
-
+/* Calendario */
 .fc-toolbar-title {
     text-transform: uppercase !important;
     white-space: nowrap;
 }
 
-
-/* =========================================================
-   EVENTOS DEL CALENDARIO
-   ========================================================= */
-
+/* Eventos */
 .evento-reserva {
     width: 100%;
     padding: 4px 6px;
@@ -162,7 +89,6 @@ body {
     border: none;
     border-radius: 0;
 }
-
 
 .evento-pendiente {
     background-color: #fff3cd !important;
@@ -188,100 +114,62 @@ body {
     color: #41464b !important;
 }
 
-
-/* =========================================================
-   HORA DE LA RESERVA
-   ========================================================= */
-
 .evento-hora {
-
     font-size: 0.72rem;
-
     font-weight: 700;
-
     margin-bottom: 2px;
 }
 
-
-/* =========================================================
-   NOMBRE DEL LABORATORIO
-   ========================================================= */
-
 .evento-laboratorio {
-
     font-size: 0.78rem;
-
     font-weight: 600;
-
     white-space: normal;
-
     overflow-wrap: anywhere;
 }
-
-
-/* =========================================================
-   PRACTICA
-   ========================================================= */
 
 .evento-practica {
-
     font-size: 0.72rem;
-
     font-weight: 500;
-
     white-space: normal;
-
     overflow-wrap: anywhere;
 }
 
-
-/* =========================================================
-   ESTADO DE LA RESERVA
-   ========================================================= */
-
 .evento-estado {
-
     font-size: 0.68rem;
-
     font-weight: 700;
-
     text-transform: uppercase;
-
     margin-top: 2px;
 }
 
-/* =========================================================
-   COLORES DEL TEXTO EN VISTA SEMANAL
-   ========================================================= */
-
-.fc-timegrid-event.evento-pendiente {
+/* Color del texto */
+.fc-timegrid-event.evento-pendiente,
+.fc-timegrid-event.evento-pendiente .evento-reserva,
+.fc-daygrid-event.evento-pendiente,
+.fc-daygrid-event.evento-pendiente .fc-event-main,
+.fc-daygrid-event.evento-pendiente .fc-event-main * {
     color: #664d03 !important;
 }
 
-.fc-timegrid-event.evento-pendiente .evento-reserva {
-    color: #664d03 !important;
-}
-
-.fc-timegrid-event.evento-aprobada {
+.fc-timegrid-event.evento-aprobada,
+.fc-timegrid-event.evento-aprobada .evento-reserva,
+.fc-daygrid-event.evento-aprobada,
+.fc-daygrid-event.evento-aprobada .fc-event-main,
+.fc-daygrid-event.evento-aprobada .fc-event-main * {
     color: #0f5132 !important;
 }
 
-.fc-timegrid-event.evento-aprobada .evento-reserva {
-    color: #0f5132 !important;
-}
-
-.fc-timegrid-event.evento-rechazada {
+.fc-timegrid-event.evento-rechazada,
+.fc-timegrid-event.evento-rechazada .evento-reserva,
+.fc-daygrid-event.evento-rechazada,
+.fc-daygrid-event.evento-rechazada .fc-event-main,
+.fc-daygrid-event.evento-rechazada .fc-event-main * {
     color: #842029 !important;
 }
 
-.fc-timegrid-event.evento-rechazada .evento-reserva {
-    color: #842029 !important;
-}
-
-.fc-timegrid-event.evento-cancelada {
-    color: #41464b !important;
-}
-
-.fc-timegrid-event.evento-cancelada .evento-reserva {
+.fc-timegrid-event.evento-cancelada,
+.fc-timegrid-event.evento-cancelada .evento-reserva,
+.fc-daygrid-event.evento-cancelada,
+.fc-daygrid-event.evento-cancelada .fc-event-main,
+.fc-daygrid-event.evento-cancelada .fc-event-main * {
     color: #41464b !important;
 }

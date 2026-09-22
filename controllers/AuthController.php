@@ -1,30 +1,18 @@
 <?php
-
 require_once __DIR__ . '/../models/Usuario.php';
 require_once __DIR__ . '/../services/DirectorioInstitucional.php';
 
-/**
- * Controlador de Autenticación
- *
- * Gestiona el inicio de sesión y permite preparar la integración
- * futura con el Directorio Institucional de la UNS.
- */
-class AuthController
-{
+class AuthController {
     private Usuario $usuarioModel;
     private DirectorioInstitucional $directorio;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->usuarioModel = new Usuario();
         $this->directorio = new DirectorioInstitucional();
     }
 
-    /**
-     * Valida las credenciales del usuario.
-     */
-    public function login(string $correo, string $passwordPlano): array
-    {
+    // Valida las credenciales del usuario
+    public function login(string $correo, string $passwordPlano): array {
         if (empty($correo) || empty($passwordPlano)) {
             return [
                 "success" => false,
@@ -32,16 +20,8 @@ class AuthController
             ];
         }
 
-        /*
-         * -------------------------------------------------------
-         * Integración con el Directorio Institucional
-         * -------------------------------------------------------
-         *
-         * Actualmente no está disponible porque el prototipo
-         * no tiene acceso al servicio institucional de la UNS.
-         */
+        // Intenta usar el directorio institucional
         if ($this->directorio->estaDisponible()) {
-
             $usuarioDirectorio = $this->directorio->autenticar(
                 $correo,
                 $passwordPlano
@@ -57,11 +37,7 @@ class AuthController
             return $this->crearSesion($usuarioDirectorio);
         }
 
-        /*
-         * -------------------------------------------------------
-         * Autenticación local del prototipo
-         * -------------------------------------------------------
-         */
+        // Usa la autenticacion local del prototipo
         $usuario = $this->usuarioModel->buscarPorCorreo($correo);
 
         if (!$usuario) {
@@ -71,7 +47,7 @@ class AuthController
             ];
         }
 
-        if ((int)$usuario['estado'] !== 1) {
+        if ((int) $usuario['estado'] !== 1) {
             return [
                 "success" => false,
                 "message" => "Tu cuenta se encuentra inactiva. Contacta al administrador."
@@ -88,11 +64,8 @@ class AuthController
         return $this->crearSesion($usuario);
     }
 
-    /**
-     * Crea la sesión después de una autenticación correcta.
-     */
-    private function crearSesion(array $usuario): array
-    {
+    // Crea la sesion despues de autenticar
+    private function crearSesion(array $usuario): array {
         session_regenerate_id(true);
 
         $_SESSION['id_usuario'] = $usuario['id_usuario'];

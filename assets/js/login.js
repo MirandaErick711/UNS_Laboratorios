@@ -4,13 +4,12 @@ document.getElementById('formLogin').addEventListener('submit', async function (
     const correo = document.getElementById('correo').value.trim();
     const password = document.getElementById('password').value;
 
-    const alertBox = document.getElementById('loginAlert');
     const btnLogin = document.getElementById('btnLogin');
     const btnText = document.getElementById('btnText');
     const btnSpinner = document.getElementById('btnSpinner');
 
-    // UI: estado de carga
-    alertBox.style.display = 'none';
+    // Estado de carga
+    document.getElementById('loginAlert').style.display = 'none';
     btnLogin.disabled = true;
     btnText.textContent = 'Verificando...';
     btnSpinner.classList.remove('d-none');
@@ -25,7 +24,7 @@ document.getElementById('formLogin').addEventListener('submit', async function (
         const data = await response.json();
 
         if (data.success) {
-            // Redirección dinámica según el rol del usuario
+            // Redirige segun el rol
             switch (data.rol) {
                 case 'Docente':
                     window.location.href = 'views/dashboard_docente.php';
@@ -43,7 +42,6 @@ document.getElementById('formLogin').addEventListener('submit', async function (
         } else {
             mostrarError(data.message || 'No se pudo iniciar sesión.');
         }
-
     } catch (error) {
         console.error('Error en la solicitud:', error);
         mostrarError('Error de conexión con el servidor.');
@@ -54,6 +52,7 @@ document.getElementById('formLogin').addEventListener('submit', async function (
     }
 });
 
+// Muestra un error en el formulario
 function mostrarError(mensaje) {
     const alertBox = document.getElementById('loginAlert');
     alertBox.textContent = mensaje;

@@ -1,30 +1,13 @@
 <?php
 
-/**
- * Servicio de integración con el correo institucional.
- *
- * Actualmente funciona como una capa preparada para una futura
- * integración con el servicio de correo de la UNS.
- */
-class CorreoInstitucional
-{
-    /**
-     * Indica si existe una configuración real de correo.
-     *
-     * En el prototipo permanece desactivada porque no se dispone
-     * de las credenciales SMTP institucionales.
-     */
-    public function estaDisponible(): bool
-    {
+// Servicio preparado para el correo institucional
+class CorreoInstitucional{
+    // Indica si el correo esta disponible
+    public function estaDisponible(): bool{
         return false;
     }
 
-    /**
-     * Envía un correo electrónico.
-     *
-     * La implementación real dependerá del servidor SMTP
-     * o servicio de correo que proporcione la universidad.
-     */
+    // Envia un correo
     public function enviar(
         string $destinatario,
         string $asunto,
@@ -34,9 +17,7 @@ class CorreoInstitucional
             return false;
         }
 
-        // Aquí se implementaría el envío mediante SMTP
-        // o el servicio institucional correspondiente.
-
+        // Aqui se implementara el envio real
         return false;
     }
 }
