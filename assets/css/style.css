@@ -40,7 +40,9 @@ body {
 }
 
 .login-brand img {
-    width: 90px;
+    width: 200px !important;
+    height: auto !important;
+    max-width: none !important;
     margin-bottom: 1rem;
 }
 
@@ -68,4 +70,108 @@ body {
 
 #loginAlert {
     display: none;
+}
+
+.fc-toolbar-title {
+    text-transform: uppercase !important;
+}
+
+/* =========================================================
+   EVENTOS DEL CALENDARIO
+   ========================================================= */
+
+.evento-reserva {
+    width: 100%;
+    padding: 2px 4px;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+
+/* Hora de la reserva */
+
+.evento-hora {
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+
+/* Nombre del laboratorio */
+
+.evento-laboratorio {
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+
+/* Estado de la reserva */
+
+.evento-estado {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* =========================================================
+   COLORES SEGUN ESTADO DE LA RESERVA
+   ========================================================= */
+
+/* Reserva pendiente */
+.evento-pendiente {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    color: #664d03;
+}
+
+
+/* Reserva aprobada */
+.evento-aprobada {
+    background-color: #d1e7dd;
+    border-left: 4px solid #198754;
+    color: #0f5132;
+}
+
+
+/* Reserva rechazada */
+.evento-rechazada {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    color: #842029;
+}
+
+
+/* =========================================================
+   CONTENIDO DE LA RESERVA
+   ========================================================= */
+
+.evento-reserva {
+    width: 100%;
+    padding: 3px 5px;
+    line-height: 1.2;
+    overflow: hidden;
+    border-radius: 3px;
+}
+
+.evento-hora {
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.evento-laboratorio {
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.evento-estado {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 2px;
 }

@@ -165,7 +165,8 @@ class ReservaController
         foreach ($reservas as $r) {
 
             $evento = [
-                'id' => $r['id_reserva'],
+                'id' =>
+                    $r['id_reserva'],
 
                 'title' =>
                     "{$r['nombre_laboratorio']} · {$r['estado']}",
@@ -182,19 +183,11 @@ class ReservaController
                     ),
 
                 'extendedProps' => [
-                    'estado' => $r['estado']
+                    'estado' => $r['estado'],
+                    'laboratorio' => $r['nombre_laboratorio'],
+                    'practica' => $r['motivo'] ?? ''
                 ]
             ];
-
-            // Solo se agrega el motivo cuando pertenece
-            // al usuario que está consultando.
-            if (
-                $r['motivo'] !== null &&
-                $r['motivo'] !== ''
-            ) {
-                $evento['extendedProps']['motivo'] =
-                    $r['motivo'];
-            }
 
             $eventos[] = $evento;
         }

@@ -3,65 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Sistema de Reservas de Laboratorios | UNS</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <!-- Estilos institucionales -->
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
+
 <body>
 
 <div class="login-wrapper container">
+
     <div class="login-card row g-0">
 
         <!-- Panel izquierdo: identidad UNS -->
         <div class="col-md-5 login-brand">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Escudo_UNS.png/200px-Escudo_UNS.png"
-                 alt="Escudo UNS" onerror="this.style.display='none'">
-            <h4 class="fw-bold">Universidad Nacional del Santa</h4>
-            <p class="mb-0">Sistema de Reserva de Laboratorios de Cómputo</p>
-            <small class="mt-3 opacity-75">Facultad de Ingeniería</small>
+
+            <!-- Logo de la Universidad Nacional del Santa -->
+            <img src="assets/img/logo_uns.png"
+                 alt="Escudo de la Universidad Nacional del Santa">
+
+            <h4 class="fw-bold">
+                Universidad Nacional del Santa
+            </h4>
+
+            <p class="mb-0">
+                Sistema de Reserva de Laboratorios de Cómputo
+            </p>
+
+            <small class="mt-3 opacity-75">
+                Facultad de Ingeniería
+            </small>
+
         </div>
+
 
         <!-- Panel derecho: formulario -->
         <div class="col-md-7 login-form-container">
-            <h3 class="fw-bold mb-1" style="color: var(--uns-rojo);">Iniciar Sesión</h3>
-            <p class="text-muted mb-4">Ingresa con tu correo institucional</p>
+
+            <h3 class="fw-bold mb-1" style="color: var(--uns-rojo);">
+                Iniciar Sesión
+            </h3>
+
+            <p class="text-muted mb-4">
+                Ingresa con tu correo institucional
+            </p>
+
 
             <div id="loginAlert" class="alert alert-danger py-2"></div>
 
+
             <form id="formLogin" novalidate>
+
+                <!-- Correo -->
                 <div class="mb-3">
-                    <label class="form-label">Correo institucional</label>
+
+                    <label class="form-label">
+                        Correo institucional
+                    </label>
+
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email" class="form-control" id="correo" required
-                               placeholder="usuario@uns.edu.pe">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="correo"
+                            required
+                            placeholder="usuario@uns.edu.pe">
+
                     </div>
+
                 </div>
 
+
+                <!-- Contraseña -->
                 <div class="mb-4">
-                    <label class="form-label">Contraseña</label>
+
+                    <label class="form-label">
+                        Contraseña
+                    </label>
+
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                        <input type="password" class="form-control" id="password" required
-                               placeholder="••••••••">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-lock"></i>
+                        </span>
+
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="password"
+                            required
+                            placeholder="••••••••">
+
                     </div>
+
                 </div>
 
-                <button type="submit" class="btn btn-uns w-100 py-2" id="btnLogin">
-                    <span id="btnText">Ingresar</span>
-                    <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
+
+                <!-- Botón ingresar -->
+                <button
+                    type="submit"
+                    class="btn btn-uns w-100 py-2"
+                    id="btnLogin">
+
+                    <span id="btnText">
+                        Ingresar
+                    </span>
+
+                    <span
+                        id="btnSpinner"
+                        class="spinner-border spinner-border-sm ms-2 d-none">
+                    </span>
+
                 </button>
+
+                <div class="text-center mt-3">
+
+                    <small class="text-muted">
+                        ¿Eres estudiante?
+                    </small>
+
+                    <br>
+
+                    <a href="calendario_publico.html"
+                    class="text-decoration-none"
+                    style="color: var(--uns-rojo);">
+                        Consultar disponibilidad de laboratorios
+                    </a>
+
+                </div>
+
             </form>
+
         </div>
+
     </div>
+
 </div>
 
+
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript del login -->
 <script src="assets/js/login.js"></script>
+
 </body>
 </html>
