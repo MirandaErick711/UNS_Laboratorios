@@ -22,8 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('btnGuardarReserva');
 
 
-    // Verificar que los elementos existan
-
     if (!formReserva) {
         console.error(
             'No se encontro el formulario formReserva'
@@ -88,319 +86,279 @@ document.addEventListener('DOMContentLoaded', function () {
                 calendarEl,
                 {
 
-                    initialView:
-                        'dayGridMonth',
+                    initialView: 'dayGridMonth',
 
-                    locale:
-                        'es',
+                    locale: 'es',
 
-                    height:
-                        'auto',
+                    height: 'auto',
 
                     titleFormat: {
                         year: 'numeric',
                         month: 'long'
                     },
 
-
-                    // ------------------------------------------------
-                    // BOTONES DEL CALENDARIO
-                    // ------------------------------------------------
-
                     headerToolbar: {
-                        left:
-                            'prev,next today',
-
-                        center:
-                            'title',
-
-                        right:
-                            'dayGridMonth,timeGridWeek'
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek'
                     },
-
 
                     buttonText: {
-                        today:
-                            'Hoy',
-
-                        month:
-                            'Mes',
-
-                        week:
-                            'Semana'
+                        today: 'Hoy',
+                        month: 'Mes',
+                        week: 'Semana'
                     },
 
-
-                    // ------------------------------------------------
+                    // ===================================================
                     // CARGAR RESERVAS
-                    // ------------------------------------------------
+                    // ===================================================
 
-                    events:
-                        function (
-                            fetchInfo,
-                            successCallback,
-                            failureCallback
-                        ) {
+                    events: function (
+                        fetchInfo,
+                        successCallback,
+                        failureCallback
+                    ) {
 
-                            fetch(
-                                '../api/reservas.php',
-                                {
-                                    method:
-                                        'GET',
-
-                                    headers: {
-                                        'Content-Type':
-                                            'application/json'
-                                    }
+                        fetch(
+                            '../api/reservas.php',
+                            {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type':
+                                        'application/json'
                                 }
-                            )
+                            }
+                        )
+                        .then(response => {
 
-                                .then(
-                                    response => {
-
-                                        if (
-                                            !response.ok
-                                        ) {
-
-                                            throw new Error(
-                                                'No se pudo cargar el calendario.'
-                                            );
-                                        }
-
-                                        return response.json();
-                                    }
-                                )
-
-                                .then(
-                                    data => {
-
-                                        successCallback(
-                                            data
-                                        );
-                                    }
-                                )
-
-                                .catch(
-                                    error => {
-
-                                        console.error(
-                                            'Error al cargar eventos:',
-                                            error
-                                        );
-
-                                        failureCallback(
-                                            error
-                                        );
-                                    }
-                                );
-                        },
-
-
-                    // ------------------------------------------------
-                    // CONTENIDO DE CADA RESERVA
-                    // ------------------------------------------------
-
-                    eventContent:
-                        function (info) {
-
-                            const inicio =
-                                info.event.start;
-
-                            const fin =
-                                info.event.end;
-
-
-                            // ================================
-                            // HORA DE INICIO
-                            // ================================
-
-                            const horaInicio =
-                                inicio
-                                    ? inicio.toLocaleTimeString(
-                                        'es-PE',
-                                        {
-                                            hour:
-                                                '2-digit',
-
-                                            minute:
-                                                '2-digit',
-
-                                            hour12:
-                                                false
-                                        }
-                                    )
-                                    : '';
-
-
-                            // ================================
-                            // HORA DE FIN
-                            // ================================
-
-                            const horaFin =
-                                fin
-                                    ? fin.toLocaleTimeString(
-                                        'es-PE',
-                                        {
-                                            hour:
-                                                '2-digit',
-
-                                            minute:
-                                                '2-digit',
-
-                                            hour12:
-                                                false
-                                        }
-                                    )
-                                    : '';
-
-
-                            // ================================
-                            // DATOS DE LA RESERVA
-                            // ================================
-
-                            const estado =
-                                info.event
-                                    .extendedProps
-                                    .estado || '';
-
-
-                            const practica =
-                                info.event
-                                    .extendedProps
-                                    .practica || '';
-
-
-                            const laboratorio =
-                                info.event
-                                    .extendedProps
-                                    .laboratorio ||
-                                info.event.title;
-
-
-                            // ================================
-                            // CONTENEDOR
-                            // ================================
-
-                            const contenedor =
-                                document.createElement(
-                                    'div'
-                                );
-
-                            contenedor.classList.add(
-                                'evento-reserva'
-                            );
-
-
-                            // ================================
-                            // HORA
-                            // ================================
-
-                            const elementoHora =
-                                document.createElement(
-                                    'div'
-                                );
-
-                            elementoHora.classList.add(
-                                'evento-hora'
-                            );
-
-                            elementoHora.textContent =
-                                horaInicio &&
-                                horaFin
-                                    ? `${horaInicio} - ${horaFin}`
-                                    : horaInicio;
-
-
-                            // ================================
-                            // LABORATORIO
-                            // ================================
-
-                            const elementoLaboratorio =
-                                document.createElement(
-                                    'div'
-                                );
-
-                            elementoLaboratorio.classList.add(
-                                'evento-laboratorio'
-                            );
-
-                            elementoLaboratorio.textContent =
-                                laboratorio;
-
-
-                            // ================================
-                            // PRACTICA
-                            // ================================
-
-                            const elementoPractica =
-                                document.createElement(
-                                    'div'
-                                );
-
-                            elementoPractica.classList.add(
-                                'evento-practica'
-                            );
-
-                            elementoPractica.textContent =
-                                practica;
-
-
-                            // ================================
-                            // ESTADO
-                            // ================================
-
-                            const elementoEstado =
-                                document.createElement(
-                                    'div'
-                                );
-
-                            elementoEstado.classList.add(
-                                'evento-estado'
-                            );
-
-                            elementoEstado.textContent =
-                                estado;
-
-
-                            // ================================
-                            // AGREGAR ELEMENTOS
-                            // ================================
-
-                            contenedor.appendChild(
-                                elementoHora
-                            );
-
-                            contenedor.appendChild(
-                                elementoLaboratorio
-                            );
-
-                            if (practica) {
-
-                                contenedor.appendChild(
-                                    elementoPractica
+                            if (!response.ok) {
+                                throw new Error(
+                                    'No se pudo cargar el calendario.'
                                 );
                             }
 
-                            contenedor.appendChild(
-                                elementoEstado
+                            return response.json();
+                        })
+                        .then(data => {
+
+                            console.log(
+                                'Reservas recibidas:',
+                                data
                             );
 
+                            successCallback(data);
+                        })
+                        .catch(error => {
 
-                            // ================================
-                            // TOOLTIP
-                            // ================================
+                            console.error(
+                                'Error al cargar eventos:',
+                                error
+                            );
 
-                            contenedor.title =
-                                practica
-                                    ? `${laboratorio} - ${practica}`
-                                    : laboratorio;
+                            failureCallback(error);
+                        });
+                    },
 
 
-                            return {
-                                domNodes:
-                                    [contenedor]
-                            };
+                    // ===================================================
+                    // APLICAR ESTILO SEGUN ESTADO
+                    // ===================================================
+
+                    eventDidMount: function(info) {
+
+                        const estado =
+                            info.event.extendedProps.estado || '';
+
+                        let claseEstado = '';
+
+                        if (estado === 'Pendiente') {
+
+                            claseEstado = 'evento-pendiente';
+
+                        } else if (estado === 'Aprobada') {
+
+                            claseEstado = 'evento-aprobada';
+
+                        } else if (estado === 'Rechazada') {
+
+                            claseEstado = 'evento-rechazada';
+
+                        } else if (estado === 'Cancelada') {
+
+                            claseEstado = 'evento-cancelada';
                         }
+
+                        /*
+                        * Aplicamos la clase también al evento de FullCalendar.
+                        * Esto permite que funcione tanto en Mes como en Semana.
+                        */
+
+                        if (claseEstado) {
+
+                            info.el.classList.add(claseEstado);
+                        }
+
+                        console.log(
+                            'Evento:',
+                            info.event.title,
+                            '| Estado:',
+                            estado,
+                            '| Clase:',
+                            claseEstado
+                        );
+                    },
+
+                // ===================================================
+                // CONTENIDO DE LA RESERVA
+                // ===================================================
+
+                eventContent: function(info) {
+
+                    const inicio = info.event.start;
+                    const fin = info.event.end;
+
+                    const horaInicio =
+                        inicio
+                            ? inicio.toLocaleTimeString(
+                                'es-PE',
+                                {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                }
+                            )
+                            : '';
+
+                    const horaFin =
+                        fin
+                            ? fin.toLocaleTimeString(
+                                'es-PE',
+                                {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                }
+                            )
+                            : '';
+
+                    const estado =
+                        info.event.extendedProps.estado || '';
+
+                    const practica =
+                        info.event.extendedProps.practica || '';
+
+                    const laboratorio =
+                        info.event.extendedProps.laboratorio ||
+                        info.event.title;
+
+                    const contenedor =
+                        document.createElement('div');
+
+                    // SOLO el contenedor de informacion
+                    contenedor.classList.add(
+                        'evento-reserva'
+                    );
+
+
+                    // ===================================================
+                    // HORA
+                    // ===================================================
+
+                    const elementoHora =
+                        document.createElement('div');
+
+                    elementoHora.classList.add(
+                        'evento-hora'
+                    );
+
+                    elementoHora.textContent =
+                        `${horaInicio} - ${horaFin}`;
+
+
+                    // ===================================================
+                    // LABORATORIO
+                    // ===================================================
+
+                    const elementoLaboratorio =
+                        document.createElement('div');
+
+                    elementoLaboratorio.classList.add(
+                        'evento-laboratorio'
+                    );
+
+                    elementoLaboratorio.textContent =
+                        laboratorio;
+
+
+                    // ===================================================
+                    // PRACTICA
+                    // ===================================================
+
+                    const elementoPractica =
+                        document.createElement('div');
+
+                    elementoPractica.classList.add(
+                        'evento-practica'
+                    );
+
+                    elementoPractica.textContent =
+                        practica;
+
+
+                    // ===================================================
+                    // ESTADO
+                    // ===================================================
+
+                    const elementoEstado =
+                        document.createElement('div');
+
+                    elementoEstado.classList.add(
+                        'evento-estado'
+                    );
+
+                    elementoEstado.textContent =
+                        estado;
+
+
+                    // ===================================================
+                    // AGREGAR ELEMENTOS
+                    // ===================================================
+
+                    contenedor.appendChild(
+                        elementoHora
+                    );
+
+                    contenedor.appendChild(
+                        elementoLaboratorio
+                    );
+
+                    if (practica) {
+
+                        contenedor.appendChild(
+                            elementoPractica
+                        );
+                    }
+
+                    contenedor.appendChild(
+                        elementoEstado
+                    );
+
+
+                    // ===================================================
+                    // TOOLTIP
+                    // ===================================================
+
+                    contenedor.title =
+                        practica
+                            ? `${laboratorio} - ${practica}`
+                            : laboratorio;
+
+
+                    return {
+                        domNodes: [contenedor]
+                    };
+                }
+
                 }
             );
 
@@ -411,25 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         calendar.render();
 
-
-        // =======================================================
-        // CAMBIAR TITULO DEL CALENDARIO A MAYUSCULAS
-        // =======================================================
-
-        const tituloCalendario =
-            calendarEl.querySelector(
-                '.fc-toolbar-title'
-            );
-
-
-        if (tituloCalendario) {
-
-            tituloCalendario.textContent =
-                tituloCalendario.textContent.toUpperCase();
-        }
-
-
-        // Guardar instancia
+        // Guardr instancia
 
         window.calendarInstance =
             calendar;
@@ -589,8 +529,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     await fetch(
                         '../api/reservas.php',
                         {
-                            method:
-                                'POST',
+                            method: 'POST',
 
                             headers: {
                                 'Content-Type':

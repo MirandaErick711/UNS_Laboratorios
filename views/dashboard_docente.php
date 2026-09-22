@@ -32,6 +32,11 @@ $idUsuario = (int) $_SESSION['id_usuario'];
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
         rel="stylesheet"
     >
+    <!-- FullCalendar CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css"
+    >
     <!-- Estilos del proyecto -->
     <link href="../assets/css/style.css" rel="stylesheet">
 
