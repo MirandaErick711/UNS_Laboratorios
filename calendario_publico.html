@@ -1,402 +1,1080 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disponibilidad de Laboratorios | UNS</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Enlace CSS de FullCalendar corregido -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link href="assets/css/style.css" rel="stylesheet">
+    <title>
+        Disponibilidad de Laboratorios | UNS
+    </title>
+
+
+    <!-- ===================================================== -->
+    <!-- BOOTSTRAP                                             -->
+    <!-- ===================================================== -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- ===================================================== -->
+    <!-- ICONOS                                                -->
+    <!-- ===================================================== -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- ===================================================== -->
+    <!-- FULLCALENDAR                                          -->
+    <!-- ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css"
+    >
+
+
+    <!-- ===================================================== -->
+    <!-- ESTILOS DEL PROYECTO                                  -->
+    <!-- ===================================================== -->
+
+    <link
+        href="assets/css/style.css"
+        rel="stylesheet"
+    >
+
 
     <style>
-        .fc-toolbar-title { font-size: 1.2rem !important; text-transform: uppercase !important; }
-        .fc-button-primary { background-color: var(--uns-rojo) !important; border-color: var(--uns-rojo) !important; }
-        .fc-button-primary:hover { background-color: var(--uns-rojo-oscuro) !important; border-color: var(--uns-rojo-oscuro) !important; }
-        .fc-button-active { background-color: var(--uns-rojo-oscuro) !important; }
+
+        /* =====================================================
+           CALENDARIO
+           ===================================================== */
+
+        #calendarPublico {
+
+            background: white;
+
+            min-height: 500px;
+        }
+
+
+        /* =====================================================
+           TITULO DEL CALENDARIO
+           ===================================================== */
+
+        .fc-toolbar-title {
+
+            font-size: 1.2rem !important;
+
+            text-transform: uppercase !important;
+        }
+
+
+        /* =====================================================
+           BOTONES FULLCALENDAR
+           ===================================================== */
+
+        .fc-button-primary {
+
+            background-color:
+                var(--uns-rojo) !important;
+
+            border-color:
+                var(--uns-rojo) !important;
+        }
+
+
+        .fc-button-primary:hover {
+
+            background-color:
+                var(--uns-rojo-oscuro) !important;
+
+            border-color:
+                var(--uns-rojo-oscuro) !important;
+        }
+
+
+        .fc-button-active {
+
+            background-color:
+                var(--uns-rojo-oscuro) !important;
+
+            border-color:
+                var(--uns-rojo-oscuro) !important;
+        }
+
+
+        /* =====================================================
+           ENCABEZADO PUBLICO
+           ===================================================== */
 
         .header-publico {
-            background: linear-gradient(160deg, var(--uns-rojo) 0%, var(--uns-rojo-oscuro) 100%);
+
+            background:
+                linear-gradient(
+                    160deg,
+                    var(--uns-rojo) 0%,
+                    var(--uns-rojo-oscuro) 100%
+                );
+
             color: #fff;
+
             padding: 2.2rem 1rem;
+
             text-align: center;
         }
+
+
+        /* =====================================================
+           LEYENDA
+           ===================================================== */
+
         .leyenda-item {
+
             display: inline-flex;
+
             align-items: center;
+
             margin-right: 1.2rem;
+
             font-size: 0.9rem;
         }
+
+
         .leyenda-punto {
+
             width: 12px;
+
             height: 12px;
+
             border-radius: 50%;
+
             display: inline-block;
+
             margin-right: 6px;
         }
+
+
+        /* =====================================================
+           EVENTOS DEL CALENDARIO
+           ===================================================== */
+
+        .fc-event {
+
+            cursor: default;
+
+            border: none !important;
+
+            padding: 2px 3px !important;
+        }
+
+
+        /*
+         * Contenedor principal de cada reserva.
+         */
+
+        .evento-reserva {
+
+            width: 100%;
+
+            overflow: hidden;
+
+            line-height: 1.2;
+
+            padding: 1px 2px;
+        }
+
+
+        /*
+         * Hora.
+         */
+
+        .evento-hora {
+
+            font-size: 0.75rem;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        /*
+         * Laboratorio.
+         */
+
+        .evento-laboratorio {
+
+            font-size: 0.75rem;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        /*
+         * Practica.
+         */
+
+        .evento-practica {
+
+            font-size: 0.70rem;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            opacity: 0.95;
+        }
+
+
+        /*
+         * Estado.
+         */
+
+        .evento-estado {
+
+            font-size: 0.68rem;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        /* =====================================================
+           ESTADOS
+           ===================================================== */
+
+        .evento-aprobada {
+
+            background-color: #198754 !important;
+
+            border-color: #198754 !important;
+
+            color: white !important;
+        }
+
+
+        .evento-pendiente {
+
+            background-color: #fd7e14 !important;
+
+            border-color: #fd7e14 !important;
+
+            color: white !important;
+        }
+
+
+        .evento-rechazada {
+
+            background-color: #dc3545 !important;
+
+            border-color: #dc3545 !important;
+
+            color: white !important;
+        }
+
+
+        .evento-cancelada {
+
+            background-color: #6c757d !important;
+
+            border-color: #6c757d !important;
+
+            color: white !important;
+        }
+
+
+        /* =====================================================
+           VISTA SEMANAL
+           ===================================================== */
+
+        .fc-timegrid-event {
+
+            border-radius: 4px;
+
+            overflow: hidden;
+        }
+
+
+        .fc-timegrid-event .evento-reserva {
+
+            padding: 3px 4px;
+        }
+
+
+        .fc-timegrid-event .evento-hora {
+
+            font-size: 0.72rem;
+        }
+
+
+        .fc-timegrid-event .evento-laboratorio {
+
+            font-size: 0.78rem;
+        }
+
+
+        .fc-timegrid-event .evento-practica {
+
+            font-size: 0.70rem;
+        }
+
+
+        .fc-timegrid-event .evento-estado {
+
+            font-size: 0.68rem;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 768px) {
+
+            .fc-toolbar {
+
+                flex-wrap: wrap;
+
+                gap: 5px;
+            }
+
+
+            .fc-toolbar-title {
+
+                font-size: 1rem !important;
+            }
+
+
+            .evento-hora {
+
+                font-size: 0.68rem;
+            }
+
+
+            .evento-laboratorio {
+
+                font-size: 0.68rem;
+            }
+
+
+            .evento-practica {
+
+                font-size: 0.62rem;
+            }
+
+
+            .evento-estado {
+
+                font-size: 0.60rem;
+            }
+        }
+
     </style>
+
 </head>
+
+
 <body class="bg-light">
 
-<!-- ============================ -->
-<!-- ENCABEZADO PÚBLICO           -->
-<!-- ============================ -->
+
+<!-- ========================================================= -->
+<!-- ENCABEZADO PUBLICO                                       -->
+<!-- ========================================================= -->
+
 <div class="header-publico">
-    <h3 class="fw-bold mb-1"><i class="bi bi-calendar2-week me-2"></i>Disponibilidad de Laboratorios</h3>
-    <p class="mb-0">Universidad Nacional del Santa · Facultad de Ingeniería</p>
-    <small class="opacity-75">Consulta pública — no requiere iniciar sesión</small>
+
+    <h3 class="fw-bold mb-1">
+
+        <i class="bi bi-calendar2-week me-2"></i>
+
+        Disponibilidad de Laboratorios
+
+    </h3>
+
+
+    <p class="mb-0">
+
+        Universidad Nacional del Santa ·
+        Facultad de Ingeniería
+
+    </p>
+
+
+    <small class="opacity-75">
+
+        Consulta pública — no requiere iniciar sesión
+
+    </small>
+
 </div>
+
+
+
+<!-- ========================================================= -->
+<!-- CONTENIDO                                                -->
+<!-- ========================================================= -->
 
 <div class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+
+    <!-- ===================================================== -->
+    <!-- ENCABEZADO DEL CALENDARIO                             -->
+    <!-- ===================================================== -->
+
+    <div
+        class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"
+    >
+
         <div>
-            <span class="leyenda-item"><span class="leyenda-punto" style="background-color:#198754;"></span>Reserva Aprobada</span>
-            <span class="leyenda-item"><span class="leyenda-punto" style="background-color:#fd7e14;"></span>Reserva Pendiente</span>
+
+            <span class="leyenda-item">
+
+                <span
+                    class="leyenda-punto"
+                    style="background-color:#198754;"
+                ></span>
+
+                Reserva Aprobada
+
+            </span>
+
+
+            <span class="leyenda-item">
+
+                <span
+                    class="leyenda-punto"
+                    style="background-color:#fd7e14;"
+                ></span>
+
+                Reserva Pendiente
+
+            </span>
+
         </div>
-        <a href="index.html" class="btn btn-outline-danger btn-sm">
-            <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+
+
+        <a
+            href="index.html"
+            class="btn btn-outline-danger btn-sm"
+        >
+
+            <i class="bi bi-box-arrow-in-right me-1"></i>
+
+            Iniciar sesión
+
         </a>
+
     </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- CALENDARIO                                            -->
+    <!-- ===================================================== -->
 
     <div class="card shadow-sm border-0">
+
         <div class="card-body">
+
             <div id="calendarPublico"></div>
+
         </div>
+
     </div>
 
+
+
+    <!-- ===================================================== -->
+    <!-- INFORMACION                                           -->
+    <!-- ===================================================== -->
+
     <p class="text-center text-muted small mt-3">
-        Este calendario es de solo lectura. Para reservar un laboratorio, el personal docente debe iniciar sesión.
+
+        Este calendario es de solo lectura.
+        Para reservar un laboratorio,
+        el personal docente debe iniciar sesión.
+
     </p>
+
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Enlace JS de FullCalendar corregido -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+
+<!-- ========================================================= -->
+<!-- BOOTSTRAP                                                -->
+<!-- ========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+
+<!-- ========================================================= -->
+<!-- FULLCALENDAR                                             -->
+<!-- ========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"
+></script>
+
+
 
 <script>
-    /**
-     * Calendario público en modo SOLO LECTURA.
-     * No permite crear, mover ni modificar reservas.
-     */
 
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+
+        // =====================================================
+        // ELEMENTO DEL CALENDARIO
+        // =====================================================
 
         const calendarEl =
-            document.getElementById('calendarPublico');
+            document.getElementById(
+                'calendarPublico'
+            );
 
+
+        // =====================================================
+        // CREAR CALENDARIO
+        // =====================================================
 
         const calendar =
             new FullCalendar.Calendar(
                 calendarEl,
                 {
 
-                    // ===================================================
+
+                    // =================================================
                     // CONFIGURACION GENERAL
-                    // ===================================================
+                    // =================================================
 
-                    initialView: 'dayGridMonth',
+                    initialView:
+                        'dayGridMonth',
 
-                    locale: 'es',
+                    locale:
+                        'es',
 
-                    height: 'auto',
+                    height:
+                        'auto',
 
-                    editable: false,
+                    editable:
+                        false,
 
-                    selectable: false,
+                    selectable:
+                        false,
 
-                    eventStartEditable: false,
+                    eventStartEditable:
+                        false,
 
-                    eventDurationEditable: false,
+                    eventDurationEditable:
+                        false,
 
 
-                    // ===================================================
+                    titleFormat: {
+
+                        year: 'numeric',
+
+                        month: 'long'
+                    },
+
+
+                    // =================================================
                     // ENCABEZADO
-                    // ===================================================
+                    // =================================================
 
                     headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek'
+
+                        left:
+                            'prev,next today',
+
+                        center:
+                            'title',
+
+                        right:
+                            'dayGridMonth,timeGridWeek'
                     },
+
+
+                    // =================================================
+                    // TEXTOS DE LOS BOTONES
+                    // =================================================
 
                     buttonText: {
-                        today: 'Hoy',
-                        month: 'Mes',
-                        week: 'Semana'
+
+                        today:
+                            'Hoy',
+
+                        month:
+                            'Mes',
+
+                        week:
+                            'Semana'
                     },
 
 
-                    // ===================================================
-                    // CARGAR RESERVAS PUBLICAS
-                    // ===================================================
+                    // =================================================
+                    // CARGAR RESERVAS
+                    // =================================================
 
-                    events: function (
-                        fetchInfo,
-                        successCallback,
-                        failureCallback
-                    ) {
+                    events:
+                        function (
+                            fetchInfo,
+                            successCallback,
+                            failureCallback
+                        ) {
 
-                        fetch(
-                            'api/reservas_publicas.php',
-                            {
-                                method: 'GET'
+
+                            fetch(
+                                'api/reservas_publicas.php',
+                                {
+                                    method:
+                                        'GET',
+
+                                    headers: {
+                                        'Content-Type':
+                                            'application/json'
+                                    }
+                                }
+                            )
+
+                            .then(
+                                function(response) {
+
+
+                                    if (
+                                        !response.ok
+                                    ) {
+
+                                        throw new Error(
+                                            'No se pudo cargar la disponibilidad.'
+                                        );
+                                    }
+
+
+                                    return response.json();
+
+                                }
+                            )
+
+
+                            .then(
+                                function(data) {
+
+
+                                    console.log(
+                                        'Reservas publicas:',
+                                        data
+                                    );
+
+
+                                    /*
+                                     * Verificar que la respuesta
+                                     * sea realmente un arreglo.
+                                     */
+
+                                    if (
+                                        !Array.isArray(data)
+                                    ) {
+
+                                        throw new Error(
+                                            data.message ||
+                                            'La API no devolvio una lista de reservas.'
+                                        );
+                                    }
+
+
+                                    successCallback(
+                                        data
+                                    );
+
+                                }
+                            )
+
+
+                            .catch(
+                                function(error) {
+
+
+                                    console.error(
+                                        'Error al cargar reservas publicas:',
+                                        error
+                                    );
+
+
+                                    failureCallback(
+                                        error
+                                    );
+
+                                }
+                            );
+
+                        },
+
+
+                    // =================================================
+                    // ESTILO SEGUN ESTADO
+                    // =================================================
+
+                    eventDidMount:
+                        function(info) {
+
+
+                            const estado =
+                                info.event.extendedProps.estado ||
+                                '';
+
+
+                            let claseEstado =
+                                '';
+
+
+                            if (
+                                estado ===
+                                'Pendiente'
+                            ) {
+
+                                claseEstado =
+                                    'evento-pendiente';
+
                             }
-                        )
 
-                        .then(response => {
 
-                            if (!response.ok) {
+                            else if (
+                                estado ===
+                                'Aprobada'
+                            ) {
 
-                                throw new Error(
-                                    'No se pudo cargar la disponibilidad.'
+                                claseEstado =
+                                    'evento-aprobada';
+
+                            }
+
+
+                            else if (
+                                estado ===
+                                'Rechazada'
+                            ) {
+
+                                claseEstado =
+                                    'evento-rechazada';
+
+                            }
+
+
+                            else if (
+                                estado ===
+                                'Cancelada'
+                            ) {
+
+                                claseEstado =
+                                    'evento-cancelada';
+
+                            }
+
+
+                            if (
+                                claseEstado
+                            ) {
+
+                                info.el.classList.add(
+                                    claseEstado
                                 );
+
                             }
 
-                            return response.json();
-                        })
-
-                        .then(data => {
 
                             console.log(
-                                'Reservas publicas:',
-                                data
-                            );
-
-                            successCallback(data);
-                        })
-
-                        .catch(error => {
-
-                            console.error(
-                                'Error al cargar reservas publicas:',
-                                error
-                            );
-
-                            failureCallback(error);
-                        });
-                    },
-
-
-                    // ===================================================
-                    // COLOR SEGUN ESTADO
-                    // ===================================================
-
-                    eventDidMount: function(info) {
-
-                        const estado =
-                            info.event.extendedProps.estado || '';
-
-                        let claseEstado = '';
-
-
-                        if (estado === 'Pendiente') {
-
-                            claseEstado =
-                                'evento-pendiente';
-
-                        } else if (estado === 'Aprobada') {
-
-                            claseEstado =
-                                'evento-aprobada';
-
-                        } else if (estado === 'Rechazada') {
-
-                            claseEstado =
-                                'evento-rechazada';
-
-                        } else if (estado === 'Cancelada') {
-
-                            claseEstado =
-                                'evento-cancelada';
-                        }
-
-
-                        if (claseEstado) {
-
-                            info.el.classList.add(
+                                'Evento publico:',
+                                info.event.title,
+                                '| Estado:',
+                                estado,
+                                '| Clase:',
                                 claseEstado
                             );
-                        }
-                    },
+
+                        },
 
 
-                    // ===================================================
-                    // CONTENIDO DE LA RESERVA
-                    // ===================================================
+                    // =================================================
+                    // CONTENIDO PERSONALIZADO
+                    // =================================================
 
-                    eventContent: function(info) {
-
-                        const inicio =
-                            info.event.start;
-
-                        const fin =
-                            info.event.end;
+                    eventContent:
+                        function(info) {
 
 
-                        const horaInicio =
-                            inicio
-                                ? inicio.toLocaleTimeString(
-                                    'es-PE',
-                                    {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false
-                                    }
-                                )
-                                : '';
+                            // =============================================
+                            // DATOS DEL EVENTO
+                            // =============================================
+
+                            const inicio =
+                                info.event.start;
 
 
-                        const horaFin =
-                            fin
-                                ? fin.toLocaleTimeString(
-                                    'es-PE',
-                                    {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false
-                                    }
-                                )
-                                : '';
+                            const fin =
+                                info.event.end;
 
 
-                        const estado =
-                            info.event.extendedProps.estado || '';
+                            const estado =
+                                info.event.extendedProps.estado ||
+                                '';
 
 
-                        const practica =
-                            info.event.extendedProps.practica || '';
+                            const practica =
+                                info.event.extendedProps.practica ||
+                                '';
 
 
-                        const laboratorio =
-                            info.event.extendedProps.laboratorio ||
-                            info.event.title;
+                            const laboratorio =
+                                info.event.extendedProps.laboratorio ||
+                                info.event.title;
 
 
-                        const contenedor =
-                            document.createElement('div');
+                            // =============================================
+                            // FORMATEAR HORA DE INICIO
+                            // =============================================
+
+                            const horaInicio =
+                                inicio
+                                    ? inicio.toLocaleTimeString(
+                                        'es-PE',
+                                        {
+                                            hour:
+                                                '2-digit',
+
+                                            minute:
+                                                '2-digit',
+
+                                            hour12:
+                                                false
+                                        }
+                                    )
+                                    : '';
 
 
-                        contenedor.classList.add(
-                            'evento-reserva'
-                        );
+                            // =============================================
+                            // FORMATEAR HORA DE FIN
+                            // =============================================
+
+                            const horaFin =
+                                fin
+                                    ? fin.toLocaleTimeString(
+                                        'es-PE',
+                                        {
+                                            hour:
+                                                '2-digit',
+
+                                            minute:
+                                                '2-digit',
+
+                                            hour12:
+                                                false
+                                        }
+                                    )
+                                    : '';
 
 
-                        // ===================================================
-                        // HORA
-                        // ===================================================
+                            // =============================================
+                            // CONTENEDOR
+                            // =============================================
 
-                        const elementoHora =
-                            document.createElement('div');
-
-                        elementoHora.classList.add(
-                            'evento-hora'
-                        );
-
-                        elementoHora.textContent =
-                            `${horaInicio} - ${horaFin}`;
+                            const contenedor =
+                                document.createElement(
+                                    'div'
+                                );
 
 
-                        // ===================================================
-                        // LABORATORIO
-                        // ===================================================
-
-                        const elementoLaboratorio =
-                            document.createElement('div');
-
-                        elementoLaboratorio.classList.add(
-                            'evento-laboratorio'
-                        );
-
-                        elementoLaboratorio.textContent =
-                            laboratorio;
+                            contenedor.classList.add(
+                                'evento-reserva'
+                            );
 
 
-                        // ===================================================
-                        // PRACTICA
-                        // ===================================================
+                            // =============================================
+                            // HORA
+                            // =============================================
 
-                        const elementoPractica =
-                            document.createElement('div');
-
-                        elementoPractica.classList.add(
-                            'evento-practica'
-                        );
-
-                        elementoPractica.textContent =
-                            practica;
+                            const elementoHora =
+                                document.createElement(
+                                    'div'
+                                );
 
 
-                        // ===================================================
-                        // ESTADO
-                        // ===================================================
-
-                        const elementoEstado =
-                            document.createElement('div');
-
-                        elementoEstado.classList.add(
-                            'evento-estado'
-                        );
-
-                        elementoEstado.textContent =
-                            estado;
+                            elementoHora.classList.add(
+                                'evento-hora'
+                            );
 
 
-                        // ===================================================
-                        // AGREGAR INFORMACION
-                        // ===================================================
-
-                        contenedor.appendChild(
-                            elementoHora
-                        );
-
-                        contenedor.appendChild(
-                            elementoLaboratorio
-                        );
+                            elementoHora.textContent =
+                                `${horaInicio} - ${horaFin}`;
 
 
-                        if (practica) {
+                            // =============================================
+                            // LABORATORIO
+                            // =============================================
+
+                            const elementoLaboratorio =
+                                document.createElement(
+                                    'div'
+                                );
+
+
+                            elementoLaboratorio.classList.add(
+                                'evento-laboratorio'
+                            );
+
+
+                            elementoLaboratorio.textContent =
+                                laboratorio;
+
+
+                            // =============================================
+                            // PRACTICA
+                            // =============================================
+
+                            const elementoPractica =
+                                document.createElement(
+                                    'div'
+                                );
+
+
+                            elementoPractica.classList.add(
+                                'evento-practica'
+                            );
+
+
+                            elementoPractica.textContent =
+                                practica;
+
+
+                            // =============================================
+                            // ESTADO
+                            // =============================================
+
+                            const elementoEstado =
+                                document.createElement(
+                                    'div'
+                                );
+
+
+                            elementoEstado.classList.add(
+                                'evento-estado'
+                            );
+
+
+                            elementoEstado.textContent =
+                                estado;
+
+
+                            // =============================================
+                            // AGREGAR ELEMENTOS
+                            // =============================================
 
                             contenedor.appendChild(
-                                elementoPractica
+                                elementoHora
                             );
+
+
+                            contenedor.appendChild(
+                                elementoLaboratorio
+                            );
+
+
+                            if (
+                                practica
+                            ) {
+
+                                contenedor.appendChild(
+                                    elementoPractica
+                                );
+
+                            }
+
+
+                            contenedor.appendChild(
+                                elementoEstado
+                            );
+
+
+                            // =============================================
+                            // TOOLTIP
+                            // =============================================
+
+                            contenedor.title =
+                                practica
+                                    ? `${laboratorio} - ${practica}`
+                                    : laboratorio;
+
+
+                            // =============================================
+                            // DEVOLVER CONTENIDO
+                            // =============================================
+
+                            return {
+
+                                domNodes: [
+                                    contenedor
+                                ]
+
+                            };
+
                         }
-
-
-                        contenedor.appendChild(
-                            elementoEstado
-                        );
-
-
-                        // ===================================================
-                        // TOOLTIP
-                        // ===================================================
-
-                        contenedor.title =
-                            practica
-                                ? `${laboratorio} - ${practica}`
-                                : laboratorio;
-
-
-                        return {
-                            domNodes: [contenedor]
-                        };
-                    }
 
                 }
             );
 
 
-        // ===========================================================
+        // =====================================================
         // MOSTRAR CALENDARIO
-        // ===========================================================
+        // =====================================================
 
         calendar.render();
 
-    });
+
+        // =====================================================
+        // GUARDAR INSTANCIA
+        // =====================================================
+
+        window.calendarPublico =
+            calendar;
+
+    }
+
+);
+
 </script>
+
 </body>
+
 </html>
